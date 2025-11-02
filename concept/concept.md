@@ -28,5 +28,5 @@ In the backend I use Python with Flask
 
 ## Conventions
 - **Constant** variables in all **CAPS**
-- **Filenames** and **Clases** will be in **PascalCase**
+- **Filenames**, **Classes** and **default functions** will be in **PascalCase**
 - **variables** and **functions** in **camelCase**

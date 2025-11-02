@@ -1,0 +1,142 @@
+
+
+/* Contains general the Layout and background colors of the Page */
+
+.myBody{
+    margin: 0;
+    display: grid;  
+    background-color: #007491;
+    grid-template-columns: 1fr 7fr;
+    grid-template-rows: 1fr;
+}
+
+
+.ControlPannel{
+    /* color */
+    background-color: #00b2a3;
+    /* positioning */
+    min-height: 100vh;
+    overflow:hidden;
+    grid-area: 1 / 1;
+    /* layout inside */
+    display: flex;
+    padding: min(1vh, 1vw);
+    gap: min(1vh, 1vw);
+    flex-direction: column;
+    justify-content:flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.content-grid{
+    display: grid;
+    grid-area: 1 / 2;
+}
+
+.content{
+    padding: min(1vh, 1vw);
+    gap: min(1vh, 1vw);
+
+}
+
+
+.images{
+    display: flex;
+    flex-wrap: wrap;
+    gap: min(1vh, 1vw);
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.imgPrevBox{
+    background-color: #00b2a3;
+    border:3px solid #00b2a3;
+    width: 15vw;
+    height: 15vw;
+    cursor: pointer;
+}
+
+.imgDetailBox{
+    width: 85vw;
+    height: 98vh;
+}
+
+.imgPreview{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.imgDetail{
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+}
+
+.clickable_headline {
+    color: #007491;
+    text-decoration: none;
+    font-size: 42px;
+    cursor: pointer;
+}
+
+.pagination{
+    display: flex;
+    justify-content: center;
+}
+
+.pagination td {
+    width: 100px;
+    border: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+summary {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.suggestion_tag{
+    cursor: pointer;
+}
+
+.suggestion_tag:hover{
+    background-color: #007491;
+}
+
+
+@media (max-width: 768px) {
+:root{
+    margin: 0;
+    /* Remove default margins */
+    display: grid;
+    /* Use flexbox for layout */
+    background-color: #007491;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr;
+}
+}
