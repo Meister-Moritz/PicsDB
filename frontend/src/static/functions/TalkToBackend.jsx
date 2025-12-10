@@ -2,7 +2,7 @@ export const API_URL = `${window.location.protocol}//${window.location.hostname}
 
 
 
-export async function uploadPictures(images, tagInput){
+export async function uploadPictures(images, tagInput, setStatus){
 
     let formData = new FormData();
     
@@ -16,8 +16,7 @@ export async function uploadPictures(images, tagInput){
         method: "POST",
         body: formData,
     })
-
-    return await res.json()
+    setStatus(await res.json())
 }
 
 export async function searchTagName(inputTag){

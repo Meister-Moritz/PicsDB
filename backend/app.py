@@ -67,14 +67,20 @@ def upload():
     tagsInput:str = request.form.get("tagInput")
     tags:list[str] = tagsInput.split(",")
     files:list[FileStorage] = request.files.getlist("files")
-    failedTags:list[tuple[int,str]] = []
+    if files == []:
+        return jsonify('no files selected')
+    status = []
 
     for file in files:
+        
         pilImage = Image.open(file)
         metaTags:list[str] = myMeta.gatherTagsFromMetadata(pilImage)
-        id = f.processUpload(pilImage, keepOGFormat=len(metaTags) > 0, filename=file.filename)
-        failedTags += DB_Handler.addTags(id, tags+metaTags)
-    return jsonify(failedTags)
+        connectTagStatus = []
+        imageUploadStatus = f.processUpload(pilImage, keepOGFormat=len(metaTags) > 0, filename=file.filename)
+        if imageUploadStatus['id'] != -1:
+            connectTagStatus = DB_Handler.addTags(imageUploadStatus['id'], tags+metaTags)
+        status = f.formatStatus(status, imageUploadStatus, connectTagStatus)
+    return jsonify(status)
 
 @app.route("/addTag", methods=["POST"])
 def addTag():

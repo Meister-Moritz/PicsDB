@@ -3,7 +3,7 @@ import {uploadPictures} from "../../static/functions/TalkToBackend";
 import { useEffect, useState } from "react";
 
 export default function Upload(){
-    const [status, setStatus] = useState("")
+    const [status, setStatus] = useState([])
     const [tagInput, setTagInput] = useState("")
     const [suggestions, setSuggestions] = useState([]);
     let fileInput = []
@@ -31,10 +31,14 @@ export default function Upload(){
         <ul id="tag_suggestion">
         {suggestions.map(tag => <li className="tag_suggestion" key={tag} onClick={() => handleAppendSuggestion(tag, tagInput, setTagInput)}>{tag}</li>)}
         </ul>
-   <button onClick={() => uploadPictures(fileInput, tagInput)}>Upload</button>
+   <button onClick={() => uploadPictures(fileInput, tagInput, setStatus)}>Upload</button>
 </details>
 <div>
-    {status}
+    <ul>
+      {status.map((item, index) => (
+        <pre>{item}</pre>
+      ))}
+    </ul>
 </div>
 </>
     )

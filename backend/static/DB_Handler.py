@@ -185,7 +185,6 @@ def searchHash(hash_bin):
     return output
 
 def addImage(suffix, hash):
-
     myConection = getConn()
     cur = myConection.cursor()
     cur.execute(
@@ -212,12 +211,12 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
 
     myConection = getConn()
     cur = myConection.cursor()
-    failed:list[tuple[int, str]] = []
+    status = []
 
     for tag in tags:
         tagID = getTagID(tag)
         if tagID < 0:
-            failed.append((id, tag))
+            status.append({'id': id, 'status': f"Tag: >{tag}< doesn't exist"})
             continue
         try:
             cur.execute(
@@ -227,12 +226,13 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
                 """,
                 (id, tagID)
             )
+            status.append({'id': id, 'status': f"Sucecfully connected tag: >{tag}<"})
         except:
-            failed.append((id, tag))
+            status.append({'id': id, 'status': f"Something went wrong with tag: >{tag}<"})
 
     myConection.commit() 
     db_pool.putconn(myConection)
-    return failed
+    return status
 
 
 

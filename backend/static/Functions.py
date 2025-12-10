@@ -31,30 +31,34 @@ def addSynonymToTag(tagID:int, synonym:str):
     db.connectTagToSynonym(tagID=tagID, synonymID=synonymID)
 
 
-def processUpload(pilImage:Image, keepOGFormat:bool, filename:str) -> int:
+def processUpload(pilImage:Image, keepOGFormat:bool, filename:str) -> tuple[int, str]:
     suffix = ".webp"
     if keepOGFormat:
         suffix = "." + pilImage.format
     
     hash = handleHashing(pilImage)
-    if hash == -1:
-        return -1
-    id = DB_Handler.addImage(suffix=suffix, hash=hash)
+    if hash['newHash'] == -1:
+        return {'id':-1, 'status':f'Image already exists see ID: >{hash['oldID']}<'}
+    id = DB_Handler.addImage(suffix=suffix, hash=hash['newHash'])
     saveOG(image=pilImage, id=id, suffix=suffix)
     savePreview(image=pilImage, id=id)
-    return id
+    return {'id': id, 'status': f'upload succesfull with ID: >{id}<'}
     
 
 def handleHashing(pilImage):
+    """returns {'newHash': bin, 'oldID': int}
+    -1 if it doesnt exist"""
+
     hash_hex = str(imagehash.phash(pilImage))
     
     hash_dez = int(hash_hex, 16)
     hash_bin = bin(hash_dez)[2:]
     output = DB_Handler.searchHash(hash_bin)
     if output == None:
-        return hash_bin
+        return {'newHash': hash_bin, 'oldID': -1}
     else:
-        return -1
+        return {'newHash': -1, 'oldID': output[0]}
+    
 
 
 def saveOG(image:Image, id, suffix:str):
@@ -86,3 +90,9 @@ def getPngMetadata(img:Image):
             if isinstance(value, str):  # PNG text chunks
                 pnginfo.add_text(key, value)
     return pnginfo
+
+def formatStatus(status, imageUploadStatus, connectTagStatus):
+    status.append(f'{imageUploadStatus['status']}\n')
+    for tagS in connectTagStatus:
+        status.append(f'   {tagS['status']}\n')
+    return status
