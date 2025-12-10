@@ -5,7 +5,7 @@ export default function ImageEditor() {
   
   return (
     <>
-    <ControlPannel/>
+    <ControlPannel title={"ImageEditor"}/>
     <div className="content content-grid">
       <h1>ImageEditor {id}</h1>
     </div>

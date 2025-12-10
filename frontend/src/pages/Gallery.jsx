@@ -5,7 +5,7 @@ export default function Gallery() {
   const { page } = useParams();
   return (
     <>
-    <ControlPannel/>
+    <ControlPannel title={"Gallery"}/>
     <div className="content content-grid">
       <h1>Gallery {page}</h1>
       <Pagenation currentPage={page}/>

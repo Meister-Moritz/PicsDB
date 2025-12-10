@@ -9,6 +9,7 @@ build/
 # Content
 test/
 backend/content/
+backend/static/.env
 
 # Linux desktop trash
 .Trash-*
