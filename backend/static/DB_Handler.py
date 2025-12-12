@@ -239,34 +239,41 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
 
 
 
-# def getIDsAndSuffix(query_param: str) -> list[tuple[int, str]]:
-#     """ 
-#     Takes Query and returns all matching IDs\n
-#     returns [(id1, suffix1), (id2, suffix2),...]\n
-#     returns [] if no ids found
-#     """
+def getIDsAndSuffix(query_param: str) -> list[tuple[int, str]]:
+    """ 
+    Takes Query and returns all matching IDs\n
+    returns [(id1, suffix1), (id2, suffix2),...]\n
+    returns [] if no ids found
+    """
 
-#     # global cur
-#     # initDB()
+    myConection = getConn()
+    cur = myConection.cursor()
 
-#     myConection = psycopg2.connect(host='localhost', port='5432', database='pics_db', user=current_app.config[appC.DB_USER], password=current_app.config[appC.DB_PASSWORD])
-#     cur = myConection.cursor()
+    cur.execute(query_param)
 
-#     cur.execute(query_param)
+    queryResults = cur.fetchall()
 
-#     queryResults = cur.fetchall()
+    myConection.commit() 
+    db_pool.putconn(myConection)
+    return queryResults
 
-#     if queryResults[0] is None:
-#         queryResults = []
+def getSuffix(id:int) -> str:
+    myConection = getConn()
+    cur = myConection.cursor()
 
-#     # exitDB()
+    cur.execute(
+        """
+        SELECT suffix
+        FROM pics
+        WHERE id = %s;
+        """,
+        (id,)
+    )
+    output = cur.fetchone()
 
-#     myConection.commit()
-#     cur.close()
-#     myConection.close()
-#     return queryResults
-
-
+    myConection.commit() 
+    db_pool.putconn(myConection)
+    return output[0]
 
 
 # def preparePaths(queryResults:list[tuple[int, str]], pathToFullRes:bool) -> list[str]:
@@ -314,19 +321,3 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
 
 
 
-# def getSuffix(id:int) -> str:
-#     myConection = psycopg2.connect(host='localhost', port='5432', database='pics_db', user=current_app.config[appC.DB_USER], password=current_app.config[appC.DB_PASSWORD])
-#     cur = myConection.cursor()
-#     cur.execute(
-#         """
-#         SELECT extention
-#         FROM pics
-#         WHERE id = %s;
-#         """,
-#         (id,)
-#     )
-#     output = cur.fetchone()
-#     myConection.commit()
-#     cur.close()
-#     myConection.close()
-#     return output[0]

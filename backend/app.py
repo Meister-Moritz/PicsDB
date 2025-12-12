@@ -41,8 +41,10 @@ def serve_image():
     # Get the full file path from the query parameter
     imgID = request.args.get('imgID')
     OGimg = request.args.get('OGimg')
+    suffix = request.args.get('suffix')
 
-    suffix = DB_Handler.getSuffix(id=imgID)
+    if suffix == 'null':
+        suffix = DB_Handler.getSuffix(id=int(imgID))
     
     imgPath = app.config.get(appC.OG_PICS_PATH) / Path(str(imgID) + suffix)
     if OGimg == 'false':
