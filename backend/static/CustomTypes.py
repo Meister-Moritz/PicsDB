@@ -87,5 +87,6 @@ class appConfig:
     OG_PICS_PATH = "og_pics_path"
     PREW_PICS_PATH = "prew_pics_path"
     APP_KEY = "app_key"
+    PICS_PER_SITE = "pics_per_site"
     
 

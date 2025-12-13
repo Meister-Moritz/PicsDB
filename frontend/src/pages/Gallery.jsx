@@ -1,10 +1,11 @@
 import ControlPannel from "./components/ControlPannel";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from "react"
-import { sendQuery, API_URL } from "../static/functions/TalkToBackend"
+import { sendSearch, API_URL } from "../static/functions/TalkToBackend"
+import { useSearch } from "../App";
 
-export default function Gallery({queryState}) {
-  const { query, setQuery } = queryState; 
+export default function Gallery() {
+  const { search, setSearch } = useSearch();
   const { page } = useParams();
   const [results, setResults] = useState("")
   const totalPages = 99999
@@ -15,11 +16,11 @@ export default function Gallery({queryState}) {
   let suffix;
 
   useEffect(() => {
-    setQuery(prev => ({ ...prev, page: Number(page) }));
+    setSearch(prev => ({ ...prev, page: Number(page) }));
   }, [page]);
   useEffect(() => {
-    updateRes(query, setResults, picsPerSite)
-  }, [query]); // [query] => whenever query changes run updateRes again
+    updateRes(search, setResults)
+  }, [search]); // [search] => whenever search changes run updateRes again
 
   for (let i = 0; i<results.length;i++){
     id = results[i][0]
@@ -31,11 +32,11 @@ export default function Gallery({queryState}) {
     <>
     <ControlPannel title={"Gallery"}/>
     <div className="content content-grid">
-      <h1>Gallery {query.page}</h1>
+      <h1>Gallery {search.page}</h1>
       <div className="images">
           {listOfImgPaths}
       </div>
-      <Pagenation currentPage={query.page}/>
+      <Pagenation currentPage={search.page}/>
     </div>
     
     </>
@@ -89,10 +90,9 @@ function Pagenation({currentPage}){
 }
 
 
-async function updateRes(query, setResult, picsPerSite){
+async function updateRes(search, setResult){
 
-    const queryWithPage = addPageToQuery(query, picsPerSite)
-    const res = await sendQuery({query: queryWithPage, page: query.page});
+    const res = await sendSearch(search.searchTags, search.page);
     setResult(await res)
 
 }
@@ -106,11 +106,4 @@ function individualImage(id, suffix, navigate){
         <img className="imgPreview" key={id} src={`${API_URL}/serveImage?imgID=${id}&OGimg=${false}&suffix=${suffix}`} alt="Sample"/>
     </div>
     )
-}
-
-function addPageToQuery(query, picsPerSite){
-    let queryWithPage = query.query
-    const offset = picsPerSite * (query.page - 1)
-    queryWithPage = queryWithPage + ` limit ${picsPerSite} offset ${offset}`
-    return queryWithPage
 }

@@ -1,4 +1,4 @@
-import {searchTagName, addTagBackend} from "./TalkToBackend";
+import {searchTagName, addTagBackend, navigateID} from "./TalkToBackend";
 
 export function handleAppendSuggestion(tag, input, setInput){
     let input_list = input.split(/[,;\s/g]+/)
@@ -83,4 +83,16 @@ export function validateTagInput(raw, minTags, maxTags){
     }
 
     return {inputError: inputError, input: cleaned}
+}
+
+export async function navigateImages(search, currentID, mode, webpage, navigate){
+
+    const image = await navigateID(search.searchTags, currentID, mode)
+    let newPage = webpage + currentID
+    if(image.length > 0){
+        
+        newPage = webpage + image[0][0]
+    }
+    
+    navigate(newPage)
 }

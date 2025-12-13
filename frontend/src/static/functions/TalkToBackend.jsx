@@ -1,4 +1,4 @@
-export const API_URL = `${window.location.protocol}//${window.location.hostname}:5000/`
+export const API_URL = `${window.location.protocol}//${window.location.hostname}:5000`
 
 
 
@@ -29,18 +29,23 @@ export async function searchTagName(inputTag){
     return tags;
 }
  
-export async function sendQuery(query){
-    if (query.query == ''){
-        return 'empty'
-    }
-    let status = ''
-    const res = await fetch(`${API_URL}/api/query`, {
+export async function sendSearch(searchTags, page){
+    const res = await fetch(`${API_URL}/api/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(query)
+        body: JSON.stringify({search_tags: searchTags, page: page})
     });
     const data = await res.json();
-    console.log(data)
+    return data
+}
+
+export async function navigateID(searchTags, imgID, mode){
+    const res = await fetch(`${API_URL}/api/navigate_id`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({search_tags: searchTags, image_id: imgID, mode: mode})
+    });
+    const data = await res.json();
     return data
 }
 

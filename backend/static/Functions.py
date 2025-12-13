@@ -96,3 +96,41 @@ def formatStatus(status, imageUploadStatus, connectTagStatus):
     for tagS in connectTagStatus:
         status.append(f'   {tagS['status']}\n')
     return status
+
+def buildSearchQueryAndParams(searchTags, page, picsPerSite):
+    params = []
+    query = """ 
+select pics.id, pics.suffix
+from pics
+    left join pics_tags on pics.id = pics_tags.fk_pic
+    left join tags on pics_tags.fk_tag = tags.id
+            """
+    if searchTags != []:
+        query += '\n where tags.name = ANY(%s)'
+        params.append(searchTags)
+    query  += '\n order by pics.id asc limit %s offset %s'   
+    params.append(picsPerSite)
+    params.append(picsPerSite*(page-1))
+
+    return {'query': query, 'params': params}
+
+def buildNavQueryAndParams(searchTags, imgID, mode):
+    params = []
+    query = """
+select pics.id, pics.suffix
+from pics
+    left join pics_tags on pics.id = pics_tags.fk_pic
+    left join tags on pics_tags.fk_tag = tags.id"""
+    if searchTags != []:
+        query += 'where tags.name = ANY(%s)'
+        params.append(searchTags)
+
+    if mode == "next":
+        query  += """\n where pics.id > %s
+                    order by id asc"""
+    elif mode == "prev":
+        query  += """\n where pics.id < %s
+                    order by id desc"""
+    params.append(imgID)
+    query  += '\n limit 1'
+    return {'query': query, 'params': params}

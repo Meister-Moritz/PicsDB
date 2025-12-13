@@ -6,6 +6,7 @@ from werkzeug.datastructures.file_storage import FileStorage
 from static.CustomTypes import appConfig as appC
 from static import DB_Handler, InterpreteMetadata as myMeta, Functions as f
 from dotenv import load_dotenv
+from static.Functions import buildSearchQueryAndParams, buildNavQueryAndParams
 import os 
 from PIL import Image
 
@@ -25,15 +26,26 @@ def main():
 
 
 
-@app.route("/api/query", methods=["POST"])
+@app.route("/api/search", methods=["POST"])
 def run_query():
     data = request.get_json()
-    query = data.get("query")
-    page = data.get("query")
+    searchTags:list[str] = data.get("search_tags")
+    page:int = data.get("page")
+    query = buildSearchQueryAndParams(searchTags, page, app.config.get(appC.PICS_PER_SITE))     
     queryResults = DB_Handler.getIDsAndSuffix(query)
-    # pathList = DB_Handler.preparePaths(queryResults=queryResults, pathToFullRes=True)
-    # queryResults = [{"id": result[0], "suffix": result[1]} for result in queryResults]
-    tmp = jsonify(queryResults)
+
+    return jsonify(queryResults)
+
+
+@app.route("/api/navigate_id", methods=["POST"])
+def navigateID():
+    data = request.get_json()
+    searchTags:list[str] = data.get("search_tags")
+    imgID:int = data.get("image_id")
+    mode:str = data.get("mode")
+    query = buildNavQueryAndParams(searchTags, imgID, mode)     
+    queryResults = DB_Handler.getIDsAndSuffix(query)
+
     return jsonify(queryResults)
 
 @app.route("/serveImage")
@@ -61,7 +73,6 @@ def serve_image():
 def suggestTags():
     input = request.get_json().get("tags")
     results = DB_Handler.searchTagNames(input)
-    tmp = jsonify(results)
     return jsonify(results)
 
 @app.route("/upload", methods=["POST"])
@@ -101,6 +112,7 @@ def initApp(app):
 
     app.config[appC.OG_PICS_PATH] = os.getenv(appC.OG_PICS_PATH)
     app.config[appC.PREW_PICS_PATH] = os.getenv(appC.PREW_PICS_PATH)
+    app.config[appC.PICS_PER_SITE] = 25
     DB_Handler.initDBPool(app)
 
 if __name__ == "__main__":

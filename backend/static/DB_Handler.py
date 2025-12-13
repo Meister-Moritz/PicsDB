@@ -235,21 +235,16 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
     return status
 
 
-
-
-
-
-def getIDsAndSuffix(query_param: str) -> list[tuple[int, str]]:
+def getIDsAndSuffix(query:dict[str, list[str]]) -> list[tuple[int, str]]:
     """ 
     Takes Query and returns all matching IDs\n
     returns [(id1, suffix1), (id2, suffix2),...]\n
     returns [] if no ids found
     """
-
+    
     myConection = getConn()
     cur = myConection.cursor()
-
-    cur.execute(query_param)
+    cur.execute(query['query'], query['params'])
 
     queryResults = cur.fetchall()
 
@@ -274,6 +269,7 @@ def getSuffix(id:int) -> str:
     myConection.commit() 
     db_pool.putconn(myConection)
     return output[0]
+
 
 
 # def preparePaths(queryResults:list[tuple[int, str]], pathToFullRes:bool) -> list[str]:
