@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2 import pool
+from psycopg2.extras import execute_values
 from werkzeug.datastructures.file_storage import FileStorage
 from psycopg2.extensions import connection, cursor
 from static.CustomTypes import appConfig as appC
@@ -269,6 +270,96 @@ def getSuffix(id:int) -> str:
     myConection.commit() 
     db_pool.putconn(myConection)
     return output[0]
+
+def getTagsForImg(imgID) -> list[tuple[int, str]]:
+    output: list[tuple[int, str]]
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    cur.execute(
+        """
+select tags.id, tags.name
+from pics_tags as pt
+    join tags on pt.fk_tag = tags.id
+where pt.fk_pic = %s;
+        """,
+        (imgID,)
+    )
+    output = cur.fetchone()
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+    return output
+
+def isImgFavOfUser(imgID, userID) -> bool:
+    output: bool
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    cur.execute(
+        """
+select distinct *
+from favs
+where fk_pic = %s
+and fk_user = %s;
+        """,
+        (imgID, userID)
+    )
+    output = cur.fetchone()
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    return output != None
+
+
+def updateFavs(userID:int, newFavsState:list[tuple[int, bool]]):
+    status: str = ''
+
+    insertQuery = (
+"""
+insert into favs (fk_user, fk_pic)
+values %s
+on conflict (fk_user, fk_pic) do nothing;
+""")
+    insertValues = [] #[(UserID1, imgID1), ...]
+    
+    deleteQuery = (
+"""
+delete from favs
+where fk_user = %s
+and fk_pic = ANY(%s);
+""")
+    deleteValues = [] #[imgID1, imgID2, ...]
+    
+    for newFavState in newFavsState:
+
+        
+        imgID = int(newFavState[0])
+        isFav = newFavState[1]
+
+        if isFav:
+            insertValues.append((userID, imgID))
+        else:
+            deleteValues.append(imgID)
+
+    
+
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    if len(insertValues) > 0:
+        execute_values(cur, insertQuery, insertValues)
+    if len(deleteValues) > 0:
+        cur.execute(deleteQuery, [userID, deleteValues])
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    return status
+
 
 
 

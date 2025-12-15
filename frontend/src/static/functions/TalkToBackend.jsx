@@ -29,21 +29,21 @@ export async function searchTagName(inputTag){
     return tags;
 }
  
-export async function sendSearch(searchTags, page){
+export async function sendSearch(search){
     const res = await fetch(`${API_URL}/api/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({search_tags: searchTags, page: page})
+        body: JSON.stringify({search: search})
     });
     const data = await res.json();
     return data
 }
 
-export async function navigateID(searchTags, imgID, mode){
+export async function navigateID(search, imgID, mode){
     const res = await fetch(`${API_URL}/api/navigate_id`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({search_tags: searchTags, image_id: imgID, mode: mode})
+        body: JSON.stringify({search:search, image_id: imgID, mode: mode})
     });
     const data = await res.json();
     return data
@@ -57,6 +57,30 @@ export async function addTagBackend(tagInput, synonymInput) {
         body: JSON.stringify({
                 newTag: tagInput,
                 synonyms:synonymInput
+        })
+    });
+    const status = await res.json();
+    return status;
+    
+}
+
+export async function fetchImageDetail(id) {
+    const res = await fetch(`${API_URL}/api/imgageDetail`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({id:id})
+    });
+    const data = await res.json();
+    return data
+}
+
+export async function updateFavs(newFavState) {
+    // newFavState is [id, isFav]
+    const res = await fetch(`${API_URL}/updateFavs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+                newFavsState: [newFavState]
         })
     });
     const status = await res.json();

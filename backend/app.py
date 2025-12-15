@@ -29,9 +29,11 @@ def main():
 @app.route("/api/search", methods=["POST"])
 def run_query():
     data = request.get_json()
-    searchTags:list[str] = data.get("search_tags")
-    page:int = data.get("page")
-    query = buildSearchQueryAndParams(searchTags, page, app.config.get(appC.PICS_PER_SITE))     
+    search:dict = data.get("search")
+    searchTags = search['searchTags']
+    page = search['page']
+    favMode = search['favMode']
+    query = buildSearchQueryAndParams(searchTags=searchTags, page=page, favMode=favMode, picsPerSite=app.config.get(appC.PICS_PER_SITE))     
     queryResults = DB_Handler.getIDsAndSuffix(query)
 
     return jsonify(queryResults)
@@ -40,7 +42,10 @@ def run_query():
 @app.route("/api/navigate_id", methods=["POST"])
 def navigateID():
     data = request.get_json()
-    searchTags:list[str] = data.get("search_tags")
+    search:dict = data.get("search")
+    searchTags = search['searchTags']
+    # page = search['page']
+    # favMode = search['favMode']
     imgID:int = data.get("image_id")
     mode:str = data.get("mode")
     query = buildNavQueryAndParams(searchTags, imgID, mode)     
@@ -101,6 +106,19 @@ def addTag():
     newTag = data.get("newTag")
     synonyms = data.get("synonyms")
     status = f.createNewTag(newTag, synonyms)
+    return jsonify(status)
+
+@app.route("/api/imgageDetail", methods=["POST"])
+def imgageDetail():
+    id = request.get_json().get("id")
+    results = f.collectImageDetail(id)
+    return jsonify(results)
+
+@app.route("/updateFavs", methods=["POST"])
+def updateFavs():
+    newFavState = request.get_json().get("newFavsState")
+    userID = f.getCurrentUserID()
+    status = DB_Handler.updateFavs(userID, newFavState)
     return jsonify(status)
 
 

@@ -87,7 +87,7 @@ export function validateTagInput(raw, minTags, maxTags){
 
 export async function navigateImages(search, currentID, mode, webpage, navigate){
 
-    const image = await navigateID(search.searchTags, currentID, mode)
+    const image = await navigateID(search, currentID, mode)
     let newPage = webpage + currentID
     if(image.length > 0){
         

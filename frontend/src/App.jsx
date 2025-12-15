@@ -14,6 +14,7 @@ export const QueryContext = createContext();
 export function QueryProvider({ children }) {
   const [search, setSearch] = useState({
     searchTags: [],
+    favMode: false,
     page: 1,
   });
 

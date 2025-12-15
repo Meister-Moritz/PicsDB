@@ -97,22 +97,44 @@ def formatStatus(status, imageUploadStatus, connectTagStatus):
         status.append(f'   {tagS['status']}\n')
     return status
 
-def buildSearchQueryAndParams(searchTags, page, picsPerSite):
-    params = []
-    query = """ 
-select pics.id, pics.suffix
-from pics
-    left join pics_tags on pics.id = pics_tags.fk_pic
-    left join tags on pics_tags.fk_tag = tags.id
-            """
-    if searchTags != []:
-        query += '\n where tags.name = ANY(%s)'
-        params.append(searchTags)
-    query  += '\n order by pics.id asc limit %s offset %s'   
-    params.append(picsPerSite)
-    params.append(picsPerSite*(page-1))
+def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
+    select = [
+        "SELECT pics.id, pics.suffix",
+    ]
+    joins = [
+        "FROM pics",
+        "left join pics_tags on pics.id = pics_tags.fk_pic",
+        "left join tags on pics_tags.fk_tag = tags.id"
+    ]
+    where = []
+    params = {}
+
+    #fill lists
+    if favMode:
+        userID = getCurrentUserID()
+        joins.append('join favs on pics.id = favs.fk_pic')
+        where.append('favs.fk_user = %(user_id)s')
+        params['user_id'] = userID
+        
+    if len(searchTags) > 0:    
+        where.append('where tags.name = ANY(%(search_tags)s)')
+        params['search_tags'] = searchTags
+      
+
+    # build query from lists
+    query = " ".join(select + joins)
+    if where:
+        query += " WHERE " + " AND ".join(where)
+
+    query  += '\norder by pics.id asc limit %(limit)s offset %(offset)s' 
+    params['limit'] = picsPerSite
+    params['offset'] = picsPerSite*(page-1)
 
     return {'query': query, 'params': params}
+
+def getCurrentUserID():
+    print('ToDo: Functions.CurrentUserID')
+    return 1 #testuser
 
 def buildNavQueryAndParams(searchTags, imgID, mode):
     params = []
@@ -134,3 +156,12 @@ from pics
     params.append(imgID)
     query  += '\n limit 1'
     return {'query': query, 'params': params}
+
+def collectImageDetail(imgID):
+    """collect all details about an image
+    returns dict{tagList:list[str], isFav:bool}"""
+    userID = getCurrentUserID()
+    tagsList:list[str] = DB_Handler.getTagsForImg(imgID)
+    isFav:bool = DB_Handler.isImgFavOfUser(imgID=imgID, userID=userID)
+
+    return {'tagList': tagsList, 'isFav': isFav}
