@@ -125,6 +125,7 @@ def updateFavs():
 def initApp(app):
     load_dotenv(dotenv_path="./static/.env")
     app.secret_key = os.getenv(appC.APP_KEY)
+    app.config[appC.DB_NAME] = os.getenv(appC.DB_NAME)
     app.config[appC.DB_USER] = os.getenv(appC.DB_USER)
     app.config[appC.DB_PASSWORD] = os.getenv(appC.DB_PASSWORD)
 

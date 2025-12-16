@@ -82,6 +82,7 @@ class ConstantVariables:
     PREW_PICS_PATH = "./content/preview"
 
 class appConfig:
+    DB_NAME = "DB_name"
     DB_USER = "DB_user"
     DB_PASSWORD = "DB_password"
     OG_PICS_PATH = "og_pics_path"

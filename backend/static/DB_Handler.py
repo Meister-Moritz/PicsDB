@@ -15,7 +15,7 @@ def initDBPool(app):
         maxconn=10,
         host='localhost',
         port='5432',
-        database='ssd_db',
+        database=app.config[appC.DB_NAME],
         user=app.config[appC.DB_USER],
         password=app.config[appC.DB_PASSWORD]
     )
