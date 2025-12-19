@@ -1,6 +1,7 @@
 
 # Environment files
 .venv
+.code-workspace
 
 # Build output
 dist/

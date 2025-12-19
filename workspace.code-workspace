@@ -5,9 +5,6 @@
 		},
 		{
 			"path": "frontend/src"
-		},
-		{
-			"path": "test"
 		}
 	],
 	"settings": {}

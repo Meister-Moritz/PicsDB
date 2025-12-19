@@ -117,7 +117,7 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
         params['user_id'] = userID
         
     if len(searchTags) > 0:    
-        where.append('where tags.name = ANY(%(search_tags)s)')
+        where.append('tags.name = ANY(ARRAY[%(search_tags)s])')
         params['search_tags'] = searchTags
       
 
@@ -126,7 +126,9 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
     if where:
         query += " WHERE " + " AND ".join(where)
 
+    query  += '\ngroup by pics.id, pics.suffix' 
     query  += '\norder by pics.id asc limit %(limit)s offset %(offset)s' 
+   
     params['limit'] = picsPerSite
     params['offset'] = picsPerSite*(page-1)
 

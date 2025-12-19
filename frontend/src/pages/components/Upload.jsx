@@ -6,7 +6,7 @@ export default function Upload(){
     const [status, setStatus] = useState([])
     const [tagInput, setTagInput] = useState("")
     const [suggestions, setSuggestions] = useState([]);
-    let fileInput = []
+    const [fileInput, setSileInput] = useState([]);
     useEffect(() => {handleSuggestions(tagInput, setSuggestions)}, [tagInput]);
 
     return(
@@ -17,7 +17,7 @@ export default function Upload(){
         id="file_input" 
         type="file" 
         multiple
-        onChange={(e) => fileInput = Array.from(e.target.files)} 
+        onChange={(e) => setSileInput(Array.from(e.target.files))} 
         placeholder="Uplad files"
     />
     <input 

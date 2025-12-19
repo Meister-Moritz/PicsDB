@@ -5,18 +5,17 @@ export const API_URL = `${window.location.protocol}//${window.location.hostname}
 export async function uploadPictures(images, tagInput, setStatus){
 
     let formData = new FormData();
-    
     formData.append("tagInput", tagInput);
+    console.log('images ' + images)
     for(let i = 0; i < images.length; i++){
         formData.append("files", images[i]);
     }
-    console.log(API_URL)
-    console.log(tagInput)
+
     const res = await fetch(`${API_URL}/upload`, {
         method: "POST",
         body: formData,
     })
-    setStatus(await res.json())
+    setStatus([await res.json()])
 }
 
 export async function searchTagName(inputTag){
@@ -30,6 +29,7 @@ export async function searchTagName(inputTag){
 }
  
 export async function sendSearch(search){
+    console.log('searchTags: ' + search.searchTags)
     const res = await fetch(`${API_URL}/api/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
