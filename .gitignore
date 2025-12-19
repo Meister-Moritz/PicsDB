@@ -11,6 +11,7 @@ build/
 test/
 backend/content/
 backend/static/.env
+backend/static/__pycache__
 
 # Linux desktop trash
 .Trash-*
