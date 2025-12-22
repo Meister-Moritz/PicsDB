@@ -1,0 +1,28 @@
+.maxSize{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+.limitedSize{
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+
+.fullImage{
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+}
+
+@media (max-width: 768px){
+.limitedSize{
+    display: flex;
+    width: 100%;
+    height: 75vh;
+}
+}

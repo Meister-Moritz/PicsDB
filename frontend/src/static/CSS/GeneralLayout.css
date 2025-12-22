@@ -20,7 +20,8 @@
     grid-area: 1 / 1;
     /* layout inside */
     display: flex;
-    padding: min(1vh, 1vw);
+    padding-left: min(1vh, 1vw);
+    padding-right: min(1vh, 1vw);
     gap: min(1vh, 1vw);
     flex-direction: column;
     justify-content:flex-start;
@@ -29,38 +30,20 @@
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .content-grid{
     display: grid;
     grid-area: 1 / 2;
 }
 
+
 .content{
     padding: min(1vh, 1vw);
     gap: min(1vh, 1vw);
-
 }
 
 
+
+/* Gallery */
 .images{
     display: flex;
     flex-wrap: wrap;
@@ -73,14 +56,9 @@
 .imgPrevBox{
     background-color: #00b2a3;
     border:3px solid #00b2a3;
-    width: 15vw;
-    height: 15vw;
+    width: max(15vw, 20vh);
+    height: max(15vw, 20vh);
     cursor: pointer;
-}
-
-.imgDetailBox{
-    width: 85vw;
-    height: 98vh;
 }
 
 .imgPreview{
@@ -89,18 +67,6 @@
     object-fit: contain;
 }
 
-.imgDetail{
-    width: 100%;
-    height: 100%;
-    object-fit: contain; 
-}
-
-.clickable_headline {
-    color: #007491;
-    text-decoration: none;
-    font-size: 42px;
-    cursor: pointer;
-}
 
 .pagination{
     display: flex;
@@ -115,11 +81,6 @@
     white-space: nowrap;
 }
 
-summary {
-    font-weight: bold;
-    cursor: pointer;
-}
-
 .suggestion_tag{
     cursor: pointer;
 }
@@ -129,14 +90,75 @@ summary {
 }
 
 
-@media (max-width: 768px) {
-:root{
+@media (max-width: 768px){
+
+
+.myBody{
     margin: 0;
-    /* Remove default margins */
-    display: grid;
-    /* Use flexbox for layout */
-    background-color: #007491;
-    grid-template-columns: 1fr 3fr;
+    display: grid; 
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr;
+    background-color: #007491;
 }
+
+
+.ControlPannel{
+
+    background-color: #00b2a3;
+    grid-area: 1 / 2;
+
+    position: fixed;
+    top: 75vh;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+
+
+    display: flex;
+    padding-top: min(1vh, 1vw);
+    padding-left: min(1vh, 1vw);
+    padding-right: min(1vh, 1vw);
+    gap: min(1vh, 1vw);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content:flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+
+}
+
+.content-grid{
+    grid-area: 1 / 2;
+    padding-bottom: 25vh;
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.clickable_headline {
+    color: #007491;
+    text-decoration: none;
+    font-size: 42px;
+    cursor: pointer;
 }

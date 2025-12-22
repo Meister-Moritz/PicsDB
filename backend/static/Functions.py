@@ -127,7 +127,7 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
         query += " WHERE " + " AND ".join(where)
 
     query  += '\ngroup by pics.id, pics.suffix' 
-    query  += '\norder by pics.id asc limit %(limit)s offset %(offset)s' 
+    query  += '\norder by pics.id desc limit %(limit)s offset %(offset)s' 
    
     params['limit'] = picsPerSite
     params['offset'] = picsPerSite*(page-1)
