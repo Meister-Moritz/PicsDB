@@ -1,10 +1,11 @@
 import ControlPannel from "./components/ControlPannel";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from "react"
 import { sendSearch, API_URL } from "../static/functions/TalkToBackend"
 import { useSearch } from "../App";
 
 export default function Gallery() {
+  const location = useLocation();
   const { search, setSearch } = useSearch();
   const { page } = useParams();
   const [results, setResults] = useState("")
@@ -15,6 +16,9 @@ export default function Gallery() {
   let id;
   let suffix;
 
+  useEffect(() => {
+    updateRes(search, setResults);
+  }, [location.key]); // reload when navigated to Gallery
   useEffect(() => {
     setSearch(prev => ({ ...prev, page: Number(page) }));
   }, [page]);

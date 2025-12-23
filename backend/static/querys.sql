@@ -19,3 +19,11 @@ FROM pics
     left join pics_tags on pics.id = pics_tags.fk_pic
     left join tags on pics_tags.fk_tag = tags.id
 group by pics.id, pics.suffix
+
+
+delete from favs
+where fk_pic = 5;
+delete from pics_tags
+where fk_pic = 5;
+delete from pics
+where pics.id = 5;

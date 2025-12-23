@@ -87,3 +87,13 @@ export async function updateFavs(newFavState) {
     return status;
     
 }
+
+export async function deleteImg(id) {
+    const res = await fetch(`${API_URL}/api/deleteImg`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({id:id})
+    });
+    const status = await res.json();
+    return status
+}

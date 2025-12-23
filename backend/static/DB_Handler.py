@@ -313,6 +313,29 @@ and fk_user = %s;
 
     return output != None
 
+def deleteImg(imgID:int):
+    status:str = ''
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    cur.execute(
+        """
+delete from favs
+where fk_pic = %s;
+delete from pics_tags
+where fk_pic = %s;
+delete from pics
+where pics.id = %s;
+        """,
+        (imgID, imgID, imgID)
+    )
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    return status
+
 
 def updateFavs(userID:int, newFavsState:list[tuple[int, bool]]):
     status: str = ''

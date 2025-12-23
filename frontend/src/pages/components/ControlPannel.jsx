@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {handleAppendSuggestion, handleSuggestions, navigateImages} from "../../static/functions/GlobalFunctions";
-import { fetchImageDetail, updateFavs } from "../../static/functions/TalkToBackend"
+import { fetchImageDetail, updateFavs, deleteImg } from "../../static/functions/TalkToBackend"
+import { Confirm } from "./PopUp"
 import { useSearch } from "../../App";
 
 export default function ControlPannel({title, details = {}}) {
@@ -10,22 +11,26 @@ export default function ControlPannel({title, details = {}}) {
     const {search, setSearch } = useSearch();
     let  standartPannel = <StandartPannel search={search} setSearch={setSearch}/>
     let pannel = <></>;
+    const [popUp, setPopUp] =  useState (<></>);
 
     if ( location.pathname.toLowerCase().includes("gallery") ){
         pannel = <GalleryPannel search={search} setSearch={setSearch}/>
     }
     else if (location.pathname.toLowerCase().includes("imageviewer")) {
-        pannel = <ViewerPannel search={search} setSearch={setSearch} navigate={navigate} details={details}/>
+        pannel = <ViewerPannel search={search} setSearch={setSearch} navigate={navigate} details={details} setPopUp={setPopUp}/>
     }
 
   return (
+    <>
     <div className="ControlPannel">
     <h1>{title}</h1>
     {standartPannel}
     {pannel}
     <button onClick={()=>navigate(`/Gallery/page/${search.page}`, { replace: true })}>Gallery</button>
-    <button onClick={()=>navigate("/settings", { replace: true })}>Settings</button>
+          <button onClick={() => navigate("/settings", { replace: true })}>Settings</button>
     </div>
+    {popUp}
+    </>               
 );
 }
 
@@ -66,7 +71,7 @@ return (
 
 }
 
-function ViewerPannel({search, setSearch, navigate, details}){
+function ViewerPannel({search, setSearch, navigate, details, setPopUp}){
     const {showDetails, setShowDetails} = details
     const { id } = useParams();
     const [imgDetail, setImgDetail] = useState({idFav:false, tagList: []});
@@ -88,7 +93,7 @@ return (
     {favButton}
     <button onClick={()=>navigateImages(search, id, 'next', '/ImageViewer/id/', navigate)}>next</button>
     <button onClick={()=>navigateImages(search, id, 'prev', '/ImageViewer/id/', navigate)}>prev</button>
-    
+    <button onClick={()=>{handleDelete(setPopUp, deleteImg, id)}}>delete</button>
 </>
 )
 }
@@ -101,4 +106,8 @@ async function asyncImageDetail(id, setImgDetail){
 function handleFavButton(imgID, imgDetail, setImgDetail){
   updateFavs([imgID, !imgDetail.isFav])
   setImgDetail(prev => ({ ...prev, isFav: !imgDetail.isFav }))
+}
+
+function handleDelete(setPopUp, deleteImg, id){
+    setPopUp(<Confirm text={"Are you sure you want to delete this picture"} setPopUp={setPopUp} deleteImg={deleteImg} param={id}></Confirm>)
 }

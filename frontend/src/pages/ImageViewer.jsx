@@ -10,7 +10,6 @@ export default function ImageViewer() {
   const [pannel, setPannel] = useState(<></>)
   const [imgDivClass, setImgDivClass] = useState('maxSize')
 
-
   useEffect(() => {
     if (showDetails){
       setPannel(<ControlPannel title={"ImageViewer"} details={{showDetails:showDetails, setShowDetails:setShowDetails}}/>)

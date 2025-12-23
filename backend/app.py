@@ -114,6 +114,15 @@ def imgageDetail():
     results = f.collectImageDetail(id)
     return jsonify(results)
 
+@app.route("/api/deleteImg", methods=["POST"])
+def deleteImg():
+    id = request.get_json().get("id")
+    suffix = DB_Handler.getSuffix(id)
+    os.remove(f'{app.config[appC.OG_PICS_PATH]}/{id}{suffix}')
+    os.remove(f'{app.config[appC.PREW_PICS_PATH]}/{id}.webp')
+    status = DB_Handler.deleteImg(id) 
+    return jsonify(status)
+
 @app.route("/updateFavs", methods=["POST"])
 def updateFavs():
     newFavState = request.get_json().get("newFavsState")
