@@ -1,13 +1,14 @@
 import {searchTagName, addTagBackend, navigateID} from "./TalkToBackend";
 
+
 export function handleAppendSuggestion(tag, input, setTagInput){
-    let input_list = input.split(/[,;\s/g]+/)
+    let input_list = input.split(/[,;\s]+/)
     input_list[input_list.length-1] = tag
     setTagInput(input_list.join('\n')+'\n')
 }
 
 export async function handleSuggestions(input, setSuggestions){
-    let input_list = input.split(/[,;\s/g]+/)
+    let input_list = input.split(/[,;\s]+/)
     input = input_list[input_list.length-1]
     if (input.length < 2) {
         setSuggestions([])

@@ -30,7 +30,7 @@ def main():
 def run_query():
     data = request.get_json()
     search:dict = data.get("search")
-    searchTags = search['searchTags']
+    searchTags:dict = cleanTags(search['searchTags'])
     page = search['page']
     favMode = search['favMode']
     query = buildSearchQueryAndParams(searchTags=searchTags, page=page, favMode=favMode, picsPerSite=app.config.get(appC.PICS_PER_SITE))     
