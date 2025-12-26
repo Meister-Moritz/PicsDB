@@ -4,6 +4,7 @@ from pathlib import Path
 from PIL import Image, PngImagePlugin
 import imagehash
 from static import DB_Handler as db
+import re
 
 
 
@@ -167,3 +168,39 @@ def collectImageDetail(imgID):
     isFav:bool = DB_Handler.isImgFavOfUser(imgID=imgID, userID=userID)
 
     return {'tagList': tagsList, 'isFav': isFav}
+
+
+def cleanTags(tagsInput:str) -> dict[list[str]]:
+    tagsInput += ','
+    cleanedTags = {'positiv':[], 'negative':[]}
+    singleTag = ''
+    positiv = True
+
+    for c in tagsInput:
+        reNormalC = r"^[\w]$" # regex for a single character that is number/character/underscore
+        reNormalCAndMinus = r"^[\w-]$" # regex for a single character that is number/character/underscore/minus
+        
+        c = c.lower()
+
+        if singleTag == '': #start of word
+            if re.search(reNormalCAndMinus, c) is None:
+                continue
+            elif c == '-':
+                positiv = False
+            else:
+                positiv = True
+        
+        if c == ',' and singleTag != '': #end of word
+            if positiv == True:
+                cleanedTags['positiv'].append(singleTag)
+            else:
+                cleanedTags['negative'].append(singleTag)
+            singleTag = ''
+            continue
+
+
+        if re.search(reNormalC, c) is None:
+            continue
+        singleTag += c
+
+    return cleanedTags

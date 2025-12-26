@@ -1,12 +1,10 @@
 import {searchTagName, addTagBackend, navigateID} from "./TalkToBackend";
 
-export function handleAppendSuggestion(tag, input, setInput){
+export function handleAppendSuggestion(tag, input, setTagInput){
     let input_list = input.split(/[,;\s/g]+/)
     input_list[input_list.length-1] = tag
-    console.log(input_list.join(','))
-    setInput(input_list.join(','))
+    setTagInput(input_list.join('\n')+'\n')
 }
-
 
 export async function handleSuggestions(input, setSuggestions){
     let input_list = input.split(/[,;\s/g]+/)
@@ -26,6 +24,15 @@ export async function handleSuggestions(input, setSuggestions){
 
     setSuggestions(tags)
 };
+
+
+export function handleAdjustSize(textareaRef){
+    const el = textareaRef.current;
+    if (!el) return;
+
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+}
 
 export async function addTag(tagInput, synonymInput, status, setStatus){
     let myError = ''
@@ -96,3 +103,5 @@ export async function navigateImages(search, currentID, mode, webpage, navigate)
     
     navigate(newPage)
 }
+
+

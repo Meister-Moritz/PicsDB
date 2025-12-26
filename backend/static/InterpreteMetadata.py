@@ -3,7 +3,9 @@ import json, io
 from static import DB_Handler
 import re
 
-def gatherTagsFromMetadata(pilImage:Image) -> list[int]:
+def gatherTagsFromMetadata(pilImage:Image) -> list[str]:
+    return []
+    # must return tagnames not ids 
     tagIDs = []
     cleanedMetadata:list[str] = extractMetadata(pilImage)
     for description in cleanedMetadata:

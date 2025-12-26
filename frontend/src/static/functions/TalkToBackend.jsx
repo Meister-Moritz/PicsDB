@@ -6,7 +6,6 @@ export async function uploadPictures(images, tagInput, setStatus){
 
     let formData = new FormData();
     formData.append("tagInput", tagInput);
-    console.log('images ' + images)
     for(let i = 0; i < images.length; i++){
         formData.append("files", images[i]);
     }

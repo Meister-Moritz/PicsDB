@@ -27,3 +27,22 @@ delete from pics_tags
 where fk_pic = 5;
 delete from pics
 where pics.id = 5;
+
+\copy (
+select pics.id, pics.extention, array_agg(tags.name)
+from pics
+join pics_tags on pics.id = fk_pic
+join tags on fk_tag = tags.id
+group by pics.id) 
+to '/mnt/Sata-SSD/output.csv' csv header;
+
+select pics.id
+from pics
+join pics_tags on pics.id = fk_pic
+join tags on fk_tag = tags.id
+group by pics.id
+
+-- show all who are not from confyUI
+from pics
+where created_at < '2025-09-26 11:12';
+

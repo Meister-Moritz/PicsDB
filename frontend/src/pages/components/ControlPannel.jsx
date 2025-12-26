@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {handleAppendSuggestion, handleSuggestions, navigateImages} from "../../static/functions/GlobalFunctions";
+import {handleAppendSuggestion, handleSuggestions, navigateImages, handleAdjustSize} from "../../static/functions/GlobalFunctions";
 import { fetchImageDetail, updateFavs, deleteImg } from "../../static/functions/TalkToBackend"
 import { Confirm } from "./PopUp"
 import { useSearch } from "../../App";
@@ -37,16 +37,31 @@ export default function ControlPannel({title, details = {}}) {
 function StandartPannel({search, setSearch}){
     const [searchInput, setSearchInput] = useState("");
     const [suggestions, setSuggestions] = useState([]);
+    const textareaRef = useRef(null);
 
     useEffect(() => {handleSuggestions(searchInput, setSuggestions)}, [searchInput]);
+    useEffect(() => handleAdjustSize(textareaRef), [searchInput])
     return(
         <>
-        <input 
+        <textarea
+            name="searchInput"  
+            ref={textareaRef}
+            // onInput={handleInput}
+            onChange={(e) => setSearchInput(e.target.value)} 
+            value={searchInput}
+            rows={1}
+            style={{
+            resize: "none",
+            overflow: "hidden",
+            }}
+            placeholder="tag_1, tag_2,..."
+        />
+        {/* <input 
             type="text" 
             name="searchInput" 
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)} 
-            placeholder="tag_1, tag_2,..."/>
+            placeholder="tag_1, tag_2,..."/> */}
         <ul>
         {suggestions.map(tag => <li className="suggestion_tag" key={tag} onClick={() => handleAppendSuggestion(tag, searchInput, setSearchInput)}>{tag}</li>)}
         </ul>

@@ -6,7 +6,7 @@ from werkzeug.datastructures.file_storage import FileStorage
 from static.CustomTypes import appConfig as appC
 from static import DB_Handler, InterpreteMetadata as myMeta, Functions as f
 from dotenv import load_dotenv
-from static.Functions import buildSearchQueryAndParams, buildNavQueryAndParams
+from static.Functions import buildSearchQueryAndParams, buildNavQueryAndParams, cleanTags
 import os 
 from PIL import Image
 
@@ -83,7 +83,8 @@ def suggestTags():
 @app.route("/upload", methods=["POST"])
 def upload():
     tagsInput:str = request.form.get("tagInput")
-    tags:list[str] = tagsInput.split(",")
+    tagsLists:dict = cleanTags(tagsInput)
+    tagList:list[str] = tagsLists['positiv'] # negative tags make no sense on the upload
     files:list[FileStorage] = request.files.getlist("files")
     if files == []:
         return jsonify('no files selected')
@@ -96,7 +97,7 @@ def upload():
         connectTagStatus = []
         imageUploadStatus = f.processUpload(pilImage, keepOGFormat=len(metaTags) > 0, filename=file.filename)
         if imageUploadStatus['id'] != -1:
-            connectTagStatus = DB_Handler.addTags(imageUploadStatus['id'], tags+metaTags)
+            connectTagStatus = DB_Handler.addTags(imageUploadStatus['id'], tagList+metaTags)
         status = f.formatStatus(status, imageUploadStatus, connectTagStatus)
     return jsonify(status)
 
