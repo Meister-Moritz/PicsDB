@@ -95,7 +95,7 @@ function Pagenation({currentPage}){
 
 
 async function updateRes(search, setResult){
-
+    
     const res = await sendSearch(search);
     setResult(await res)
 

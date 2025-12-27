@@ -99,6 +99,9 @@ def formatStatus(status, imageUploadStatus, connectTagStatus):
     return status
 
 def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
+
+    positivTags = searchTags['positiv']
+    negativTags = searchTags['negative']
     select = [
         "SELECT pics.id, pics.suffix",
     ]
@@ -117,9 +120,9 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
         where.append('favs.fk_user = %(user_id)s')
         params['user_id'] = userID
         
-    if len(searchTags) > 0:    
+    if len(positivTags) > 0:    
         where.append('tags.name = ANY(ARRAY[%(search_tags)s])')
-        params['search_tags'] = searchTags
+        params['search_tags'] = positivTags
       
 
     # build query from lists
@@ -179,6 +182,7 @@ def cleanTags(tagsInput:str) -> dict[list[str]]:
     for c in tagsInput:
         reNormalC = r"^[\w]$" # regex for a single character that is number/character/underscore
         reNormalCAndMinus = r"^[\w-]$" # regex for a single character that is number/character/underscore/minus
+
         
         c = c.lower()
 
@@ -190,7 +194,7 @@ def cleanTags(tagsInput:str) -> dict[list[str]]:
             else:
                 positiv = True
         
-        if c == ',' and singleTag != '': #end of word
+        if re.search(r"^[\s-]$") and singleTag != '': #end of word
             if positiv == True:
                 cleanedTags['positiv'].append(singleTag)
             else:
