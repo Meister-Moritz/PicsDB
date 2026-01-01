@@ -194,7 +194,7 @@ def cleanTags(tagsInput:str) -> dict[list[str]]:
             else:
                 positiv = True
         
-        if re.search(r"^[\s-]$") and singleTag != '': #end of word
+        if re.search(r"^[\s-]$", c) and singleTag != '': #end of word
             if positiv == True:
                 cleanedTags['positiv'].append(singleTag)
             else:

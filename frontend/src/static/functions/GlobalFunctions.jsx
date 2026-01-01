@@ -1,10 +1,11 @@
 import {searchTagName, addTagBackend, navigateID} from "./TalkToBackend";
 
 
-export function handleAppendSuggestion(tag, input, setTagInput){
+export function handleAppendSuggestion(tag, input, setTagInput, textareaRef){
     let input_list = input.split(/[,;\s]+/)
     input_list[input_list.length-1] = tag
     setTagInput(input_list.join('\n')+'\n')
+    textareaRef.current.focus();
 }
 
 export async function handleSuggestions(input, setSuggestions){

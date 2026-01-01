@@ -63,7 +63,13 @@ function StandartPannel({search, setSearch}){
             onChange={(e) => setSearchInput(e.target.value)} 
             placeholder="tag_1, tag_2,..."/> */}
         <ul>
-        {suggestions.map(tag => <li className="suggestion_tag" key={tag} onClick={() => handleAppendSuggestion(tag, searchInput, setSearchInput)}>{tag}</li>)}
+        {suggestions.map(tag => <li key={tag}> 
+                                <button 
+                                    className="suggestion_tag"  
+                                    onClick={() => handleAppendSuggestion(tag, searchInput, setSearchInput, textareaRef)}
+                                >{tag}
+                                </button>
+                                </li>)}
         </ul>
         <button onClick={() => setSearch(prev => ({ ...prev, searchTags: searchInput}))}>search</button>
         </>
@@ -106,9 +112,13 @@ return (
 <>
     <button onClick={()=>{setShowDetails(!showDetails)}}>show/hide</button>
     {favButton}
-    <button onClick={()=>navigateImages(search, id, 'next', '/ImageViewer/id/', navigate)}>next</button>
-    <button onClick={()=>navigateImages(search, id, 'prev', '/ImageViewer/id/', navigate)}>prev</button>
+    <button onClick={()=>navigateImages(search, id, 'next', '/ImageViewer/id/', navigate)}>prev</button>
+    <button onClick={()=>navigateImages(search, id, 'prev', '/ImageViewer/id/', navigate)}>next</button>
     <button onClick={()=>{handleDelete(setPopUp, deleteImg, id)}}>delete</button>
+    <ul>
+        {console.log("img detail" + imgDetail.tagList)}
+        {imgDetail.tagList.map(tag => <li className="tag_list" key={tag}>{tag}</li>)}
+    </ul>
 </>
 )
 }

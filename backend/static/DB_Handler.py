@@ -271,22 +271,22 @@ def getSuffix(id:int) -> str:
     db_pool.putconn(myConection)
     return output[0]
 
-def getTagsForImg(imgID) -> list[tuple[int, str]]:
-    output: list[tuple[int, str]]
+def getTagsForImg(imgID) -> list[str]:
+    output: list[str]
 
     myConection = getConn()
     cur = myConection.cursor()
 
     cur.execute(
         """
-select tags.id, tags.name
+select tags.name
 from pics_tags as pt
     join tags on pt.fk_tag = tags.id
 where pt.fk_pic = %s;
         """,
         (imgID,)
     )
-    output = cur.fetchone()
+    output = cur.fetchall()
 
     myConection.commit() 
     db_pool.putconn(myConection)
