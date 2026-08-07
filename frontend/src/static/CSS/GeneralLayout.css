@@ -30,6 +30,10 @@
 
 }
 
+.userInfo{
+    margin-top: auto;
+}
+
 .content-grid{
     display: grid;
     grid-area: 1 / 2;
@@ -41,20 +45,60 @@
     gap: min(1vh, 1vw);
 }
 
-.popup{
+.settings{
+    align-content: start;
+}
+
+
+
+.popup_wrapper{
+margin: 0;
+padding: 0;
 position: fixed;
 top: 0;
 left: 0;
-width: 30vw;
-height: 30vh;
+width: 100vw;
+height: 100vh;
+background-color: rgba(0, 0, 0, 0.5);
+display: grid;
+place-items: center;
+}
+.popup{
+position: fixed;
+width: fit-content;
+height: fit-content;
 background-color: #00b2a3;
 display: flex;
-align-items: center;
-justify-content: center;
+flex-direction: column;
+align-items: stretch;
 z-index: 1000;
-
+gap: 1rem;
+padding: 3px;
 }
 
+.popup_headline{
+    margin: 0;
+    padding: 0;
+}
+
+.popup_body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* Stack the Login button, Cancel button, and status text */
+.popup_footline {
+display: flex;
+flex-direction: row;
+justify-content: space-between; /* Pushes Cancel to left, Confirm to right */
+align-items: center;            /* Keeps buttons aligned vertically */
+width: 100%;
+}
+
+.empty{
+    display: none;
+}
 
 /* Gallery */
 .images{

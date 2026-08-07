@@ -1,45 +1,70 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {handleAppendSuggestion, handleSuggestions, navigateImages, handleAdjustSize} from "../../static/functions/GlobalFunctions";
+import {handleAppendSuggestion, handleTagSuggestions, navigateImages, handleAdjustSize, getCurrentUser} from "../../static/functions/GlobalFunctions";
 import { fetchImageDetail, updateFavs, deleteImg } from "../../static/functions/TalkToBackend"
 import { Confirm } from "./PopUp"
 import { useSearch } from "../../App";
+import { Login } from "./Login";
+import { Register } from "./Register";
 
 export default function ControlPannel({title, details = {}}) {
     const location = useLocation();
     const navigate = useNavigate();
     const {search, setSearch } = useSearch();
-    let  standartPannel = <StandartPannel search={search} setSearch={setSearch}/>
     let pannel = <></>;
     const [popUp, setPopUp] =  useState (<></>);
-
+    const [userDiv, setUserDiv] = useState(<></>)
+   
     if ( location.pathname.toLowerCase().includes("gallery") ){
         pannel = <GalleryPannel search={search} setSearch={setSearch}/>
     }
     else if (location.pathname.toLowerCase().includes("imageviewer")) {
         pannel = <ViewerPannel search={search} setSearch={setSearch} navigate={navigate} details={details} setPopUp={setPopUp}/>
     }
+    
+    useEffect(() => {
+        const user = getCurrentUser()
+
+        if(getCurrentUser() != null){
+            const username = user["username"]
+            setUserDiv(
+                <div className="userInfo">
+                    <button onClick={() => setPopUp(<Register setPopUp={setPopUp}></Register>)}>Register</button>
+                    <h1>{username}</h1>
+                </div>
+        )
+        }
+        else{
+            setPopUp(<Login setPopUp={setPopUp}></Login>)
+            setUserDiv(
+                <div className="userInfo">
+                    <button onClick={() => setPopUp(<Login setPopUp={setPopUp}></Login>)}>Login</button>
+                </div>
+            )
+        }
+    },[])
 
   return (
     <>
     <div className="ControlPannel">
     <h1>{title}</h1>
-    {standartPannel}
     {pannel}
+    <button onClick={() => navigate("/settings", { replace: true })}>Settings</button>
     <button onClick={()=>navigate(`/Gallery/page/${search.page}`, { replace: true })}>Gallery</button>
-          <button onClick={() => navigate("/settings", { replace: true })}>Settings</button>
+    {userDiv}    
     </div>
     {popUp}
     </>               
 );
 }
 
-function StandartPannel({search, setSearch}){
+function SearchPannel({search, setSearch}){
     const [searchInput, setSearchInput] = useState("");
+    const [loginPopUp, setLoginPopUp] = useState(true)
     const [suggestions, setSuggestions] = useState([]);
     const textareaRef = useRef(null);
 
-    useEffect(() => {handleSuggestions(searchInput, setSuggestions)}, [searchInput]);
+    useEffect(() => {handleTagSuggestions(searchInput, setSuggestions)}, [searchInput]);
     useEffect(() => handleAdjustSize(textareaRef), [searchInput])
     return(
         <>
@@ -80,12 +105,13 @@ function GalleryPannel({search, setSearch}){
 
 return (
 <>
+<SearchPannel search={search} setSearch={setSearch}/>
     <label>
-    <input type="checkbox" 
-    checked={search.favMode}
-    onChange={(e) => setSearch(prev => ({ ...prev, favMode: e.target.checked }))}
-    />
-    Favs Only
+        <input type="checkbox" 
+            checked={search.favMode}
+            onChange={(e) => setSearch(prev => ({ ...prev, favMode: e.target.checked }))}
+        />
+        Favs Only
     </label>
 </>
 )
@@ -112,13 +138,15 @@ return (
 <>
     <button onClick={()=>{setShowDetails(!showDetails)}}>show/hide</button>
     {favButton}
-    <button onClick={()=>navigateImages(search, id, 'next', '/ImageViewer/id/', navigate)}>prev</button>
-    <button onClick={()=>navigateImages(search, id, 'prev', '/ImageViewer/id/', navigate)}>next</button>
+    <div>
+        <button onClick={()=>navigateImages(search, id, 'next', '/ImageViewer/id/', navigate)}>prev</button>
+        <button onClick={()=>navigateImages(search, id, 'prev', '/ImageViewer/id/', navigate)}>next</button>
+    </div>
     <button onClick={()=>{handleDelete(setPopUp, deleteImg, id)}}>delete</button>
     <ul>
-        {console.log("img detail" + imgDetail.tagList)}
         {imgDetail.tagList.map(tag => <li className="tag_list" key={tag}>{tag}</li>)}
     </ul>
+    <button onClick={()=>navigate(`/Gallery/page/${search.page}`, { replace: true })}>Gallery</button>
 </>
 )
 }

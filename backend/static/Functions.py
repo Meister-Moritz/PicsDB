@@ -1,7 +1,10 @@
-from static import DB_Handler, InterpreteMetadata as myMeta
+from static  import DB_Handler, InterpreteMetadata as myMeta
 from static.CustomTypes import appConfig as appC, ConstantVariables as constV
+from werkzeug.datastructures.file_storage import FileStorage
+from flask_jwt_extended import create_access_token, get_jwt_identity
 from pathlib import Path
 from PIL import Image, PngImagePlugin
+import bcrypt
 import imagehash
 from static import DB_Handler as db
 import re
@@ -10,19 +13,42 @@ import re
 
 
 
-def createNewTag(newTag:str, synonyms:str) -> str:
+def createNewTag(newTag:str, synonyms:str, tagCatName:str) -> str:
     
     status = ''
     synonyms = synonyms.split(',')
+    tagCatName = tagCatName.strip()
     tagID = db.getTagID(newTag)
     if tagID > 0:
         for synonym in synonyms:
             addSynonymToTag(tagID, synonym)
         return 'Tag already exists, but synonyms where added'
-    tagID = db.insertTag(newTag)
+    tagCatID = db.getTagCatID(tagCatName)
+    if tagCatID < 0:
+        return f"Tag category '{tagCatName}' dosn't exist, tag was not created"
+    tagID = db.insertTag(newTag, tagCatID)
     for synonym in synonyms:
         addSynonymToTag(tagID, synonym)
     return 'Tag succesfully added'
+
+def createNewTagCat(newTagCat:str, mandatoryInput:str) -> str:
+    
+    status = ''
+    newTagCat = newTagCat.strip()
+    mandatoryInput = mandatoryInput.strip()
+    try:
+        mandatoryInput:int = int(mandatoryInput)
+    except (TypeError, ValueError):
+        return 'Mandatory Tags is not a number, Tag category was not created'
+
+    tagCatID:int = db.getTagCatID(newTagCat)
+    if tagCatID == -1:
+        tagCatID:int = db.insertTagCat(newTagCat, mandatoryInput)
+        return f"Tag category succesfully added. ID: {tagCatID}"
+    else:
+        db.updateTagCatID(tagCatID, newTagCat, mandatoryInput)
+        return f"Tag category updated. ID: {tagCatID}"
+    
 
 def addSynonymToTag(tagID:int, synonym:str):
     synonymID = db.getSynonymID(synonym)
@@ -39,11 +65,11 @@ def processUpload(pilImage:Image, keepOGFormat:bool, filename:str) -> tuple[int,
     
     hash = handleHashing(pilImage)
     if hash['newHash'] == -1:
-        return {'id':-1, 'status':f'Image already exists see ID: >{hash['oldID']}<'}
+        return {'id':-1, 'status':f"Image already exists see ID: >{hash['oldID']}<"}
     id = DB_Handler.addImage(suffix=suffix, hash=hash['newHash'])
     saveOG(image=pilImage, id=id, suffix=suffix)
     savePreview(image=pilImage, id=id)
-    return {'id': id, 'status': f'upload succesfull with ID: >{id}<'}
+    return {'id': id, 'status': f"upload succesfull with ID: >{id}<"}
     
 
 def handleHashing(pilImage):
@@ -93,9 +119,9 @@ def getPngMetadata(img:Image):
     return pnginfo
 
 def formatStatus(status, imageUploadStatus, connectTagStatus):
-    status.append(f'{imageUploadStatus['status']}\n')
+    status.append(f"{imageUploadStatus['status']}\n")
     for tagS in connectTagStatus:
-        status.append(f'   {tagS['status']}\n')
+        status.append(f"   {tagS['status']}\n")
     return status
 
 def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
@@ -107,8 +133,8 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
     ]
     joins = [
         "FROM pics",
-        "left join pics_tags on pics.id = pics_tags.fk_pic",
-        "left join tags on pics_tags.fk_tag = tags.id"
+        "left join map_pics_tags on pics.id = map_pics_tags.fk_pic",
+        "left join tags on map_pics_tags.fk_tag = tags.id"
     ]
     where = []
     params = {}
@@ -139,16 +165,53 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
     return {'query': query, 'params': params}
 
 def getCurrentUserID():
-    print('ToDo: Functions.CurrentUserID')
-    return 1 #testuser
+    return get_jwt_identity() #testuser
+
+def registerNewUser(username, password) -> str:
+    # Hash the password
+    if(username == None or password == None):
+        return {"error": "Password is empty"}, 400
+        
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    del password
+
+    if DB_Handler.getUser(username)[0] > 0:
+        return {"error": "Username already exists"}, 400
+
+    userID = DB_Handler.insertUser(username, hashed_password)
+    
+    return {"error": ""}, 200
+
+def loginUser(username, password):
+    # Hash the password
+    
+    if(username == None or password == None):
+        return {"error": "Username or password are empty"}, 400
+
+    user = DB_Handler.getUser(username)
+    userID = user[0]
+    pass_hash = user[1]
+    if userID < 0:
+        return {"error": "User does not exist"}, 400
+
+    
+    isValid = bcrypt.checkpw(password.encode('utf-8'), pass_hash.encode('utf-8'))
+
+    if not isValid:
+        return {"error": "Username or password are incorrect"}, 400
+
+    access_token = create_access_token(identity=str(userID), additional_claims={"username": username})
+
+    return {"access_token": access_token}, 200
 
 def buildNavQueryAndParams(searchTags, imgID, mode):
     params = []
     query = """
 select pics.id, pics.suffix
 from pics
-    left join pics_tags on pics.id = pics_tags.fk_pic
-    left join tags on pics_tags.fk_tag = tags.id"""
+    left join map_pics_tags on pics.id = map_pics_tags.fk_pic
+    left join tags on map_pics_tags.fk_tag = tags.id"""
     if searchTags != []:
         query += 'where tags.name = ANY(%s)'
         params.append(searchTags)
@@ -173,13 +236,33 @@ def collectImageDetail(imgID):
     return {'tagList': tagsList, 'isFav': isFav}
 
 
-def cleanTags(tagsInput:str) -> dict[list[str]]:
-    tagsInput += ','
+def upload(tags:str, files:list[FileStorage]):
+    status = []
+
+    tagList = [item.strip() for item in tags.split(",")]
+    status = DB_Handler.checkMandatoryTags(tagList)
+    if(len(status) > 0):
+        return status
+    if files == []:
+        return 'no files selected'
+    for file in files:
+        pilImage = Image.open(file)
+        metaTags:list[str] = myMeta.gatherTagsFromMetadata(pilImage)
+        connectTagStatus = []
+        imageUploadStatus = processUpload(pilImage, keepOGFormat=len(metaTags) > 0, filename=file.filename)
+        if imageUploadStatus['id'] != -1:
+            connectTagStatus = DB_Handler.addTags(imageUploadStatus['id'], tagList+metaTags)
+        status = formatStatus(status, imageUploadStatus, connectTagStatus)
+    return status
+       
+
+def cleanTags(tagsInputs:str) -> dict[list[str]]:
+    tagsInputs += ','
     cleanedTags = {'positiv':[], 'negative':[]}
     singleTag = ''
     positiv = True
 
-    for c in tagsInput:
+    for c in tagsInputs:
         reNormalC = r"^[\w]$" # regex for a single character that is number/character/underscore
         reNormalCAndMinus = r"^[\w-]$" # regex for a single character that is number/character/underscore/minus
 

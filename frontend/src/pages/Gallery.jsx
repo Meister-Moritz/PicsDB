@@ -1,8 +1,11 @@
 import ControlPannel from "./components/ControlPannel";
+import AuthenticatedImage from "./components/AuthenticatedImage";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from "react"
-import { sendSearch, API_URL } from "../static/functions/TalkToBackend"
+import { sendSearch } from "../static/functions/TalkToBackend"
 import { useSearch } from "../App";
+import { getCurrentUser } from "../static/functions/GlobalFunctions"
+
 
 export default function Gallery() {
   const location = useLocation();
@@ -107,7 +110,7 @@ function individualImage(id, suffix, navigate){
   
     return (
     <div className="imgPrevBox" key={id} onClick={()=>navigate(`/ImageViewer/id/${id}`)}>
-        <img className="imgPreview" key={id} src={`${API_URL}/serveImage?imgID=${id}&OGimg=${false}&suffix=${suffix}`} alt="Sample"/>
+      <AuthenticatedImage className={"imgPreview"} imgID={id} OGimg={false} suffix={suffix} alt={"Sample"}></AuthenticatedImage>
     </div>
     )
 }

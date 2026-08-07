@@ -78,8 +78,8 @@ class Database:
 
 class ConstantVariables:
     SUFFIX = ".webp"
-    OG_PICS_PATH = "./content/original"
-    PREW_PICS_PATH = "./content/preview"
+    OG_PICS_PATH = "/app/content/original"
+    PREW_PICS_PATH = "/app/content/preview"
 
 class appConfig:
     DB_NAME = "DB_name"
@@ -89,5 +89,6 @@ class appConfig:
     PREW_PICS_PATH = "prew_pics_path"
     APP_KEY = "app_key"
     PICS_PER_SITE = "pics_per_site"
+    JWT_SECRET_KEY = "jwt_secret_key"
     
 

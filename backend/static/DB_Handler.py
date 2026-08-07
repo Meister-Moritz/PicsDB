@@ -13,7 +13,7 @@ def initDBPool(app):
     db_pool = pool.ThreadedConnectionPool(
         minconn=1,
         maxconn=10,
-        host='localhost',
+        host='db',
         port='5432',
         database=app.config[appC.DB_NAME],
         user=app.config[appC.DB_USER],
@@ -32,7 +32,7 @@ def getConn(timeout=10):
             time.sleep(0.1)  # wait 100ms before retrying
 
 
-def insertTag(tagName) -> int:
+def insertTag(tagName, tagCatID) -> int:
     """
     inserts tag into DB
     returns id if succecfull
@@ -42,10 +42,10 @@ def insertTag(tagName) -> int:
     myConection = getConn()
     cur = myConection.cursor()
     cur.execute("""
-            insert into tags (name)
-            values (%s)
+            insert into tags (name, fk_tagcats)
+            values (%s, %s)
             returning id
-            """, (tagName,))
+            """, (tagName, tagCatID))
     results = [row[0] for row in cur.fetchall()]
     
     myConection.commit() 
@@ -77,6 +77,71 @@ def insertSynonym(synonymName):
         return results[0]
     return -1
 
+def getMandatoryCats():
+    """
+    gets all tagCats with mandatoryTags > 0
+    """
+    myConection = getConn()
+    cur = myConection.cursor()
+
+
+    cur.execute("""
+select * 
+from tagcats
+where mandatory_tags > 0
+                """)
+    
+    results =  cur.fetchall()
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    print(results)
+
+    return results
+
+
+
+def insertTagCat(tagCatName, mandatoryTags) -> int:
+    """
+    inserts tagCat into DB
+    returns id if succecfull
+    returns -1 if not
+    """
+
+    myConection = getConn()
+    cur = myConection.cursor()
+    cur.execute("""
+            insert into tagCats (name, mandatory_tags)
+            values (%s, %s)
+            returning id
+            """, (tagCatName, mandatoryTags))
+    results = [row[0] for row in cur.fetchall()]
+    
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    if len(results) > 0:
+        return results[0]
+    return -1
+
+def updateTagCatID(id, tagCatName, mandatoryTags):
+    """
+    updates all values for given id
+    """
+    myConection = getConn()
+    cur = myConection.cursor()
+    cur.execute("""
+            update tagCats
+            set 
+                name = %s,
+                mandatory_tags = %s
+            where id = %s
+            """, (tagCatName, mandatoryTags, id))
+    
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
 
 def getTagID(tagName: str) -> int:
     """
@@ -103,6 +168,34 @@ def getTagID(tagName: str) -> int:
         return results[0]
 
     return -1
+
+def getTagCatID(tagCatName: str) -> int:
+    """
+    returns tagID if tag exists\n
+    returns -1 if tag doesn't exist
+    """
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+
+    cur.execute("""
+                select distinct tagcats.id
+                from tagcats
+                where tagcats.name = %s
+                """, (tagCatName,))
+    
+    results = [row[0] for row in cur.fetchall()]
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    if len(results) > 0:
+        return results[0]
+
+    return -1
+
+
 
 def getSynonymID(synonymName: str) -> int:
     """
@@ -138,7 +231,7 @@ def connectTagToSynonym(tagID:int, synonymID:int):
     cur = myConection.cursor()
 
     cur.execute("""
-            insert into tags_synonyms (fk_tag, fk_synonyms)
+            insert into map_tags_synonyms (fk_tag, fk_synonyms)
             values (%s, %s)
             """, (tagID,synonymID))
 
@@ -146,20 +239,122 @@ def connectTagToSynonym(tagID:int, synonymID:int):
     db_pool.putconn(myConection)
 
 
-
-
-def searchTagNames(tagName: str) -> list[str]:
-
+def getUser(username:str):
+    """
+    returns userID, pass_hash if user exists\n
+    returns -1, "" if user doesn't exist
+    """
 
     myConection = getConn()
     cur = myConection.cursor()
 
 
     cur.execute("""
-                select distinct tags.name as tag_name
+                select distinct users.id, users.pass_hash
+                from users
+                where users.name = %s
+                """, (username,))
+
+    results = cur.fetchall()
+    myConection.commit() 
+    db_pool.putconn(myConection)
+    
+    if len(results) > 0:
+        return results[0]
+
+    return -1, ""
+
+def validateUser(username:str, pass_hash:str):
+    """
+    returns userID if user-password combi exists\n
+    returns -1 if combi doesn't exist
+    """
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+
+    cur.execute("""
+                select distinct users.id
+                from users
+                where users.name = %s
+                and users.pass_hash = %s
+                """, (username, pass_hash))
+    
+    results = [row[0] for row in cur.fetchall()]
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    if len(results) > 0:
+        return results[0]
+
+    return -1
+
+def insertUser(username:str, passHash:str):
+    """
+    inserts user into DB
+    returns id if succecfull
+    returns -1 if unsuccecfull
+    """
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    cur.execute("""
+            insert into users (name, pass_hash)
+            values (%s, %s)
+            returning id
+            """, (username, passHash))
+    results = [row[0] for row in cur.fetchall()]
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    if len(results) > 0:
+        return results[0]
+    return -1
+
+
+def searchTagNames(tagName: str, catID:int) -> list[str]:
+
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    if(catID < 0):
+        cur.execute("""
+select distinct tags.name
+from tags
+where tags.name ilike %s
+                    """, (f'{tagName}%',))
+    else:
+        cur.execute("""
+select distinct tags.name
+from tags
+where tags.name ilike %s
+and tags.fk_tagcats = %s
+        """, (f'{tagName}%', catID,))
+        
+    results = [row[0] for row in cur.fetchall()]
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+    return results
+
+
+def searchTagCatNames(tagCatName: str) -> list[str]:
+
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    print("Todo: DB_Handler.searchTagCatNames")
+
+    cur.execute("""
+                select distinct tags.name as myName
                 from tags
-                where tags.name ilike %s
-                """, (f'%{tagName}%',))
+                where myName ilike %s
+                """, (f'{tagCatName}%',))
     
     results = [row[0] for row in cur.fetchall()]
 
@@ -222,7 +417,7 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
         try:
             cur.execute(
                 """
-                INSERT INTO pics_tags (fk_pic, fk_tag)
+                INSERT INTO map_pics_tags (fk_pic, fk_tag)
                 VALUES (%s, %s);
                 """,
                 (id, tagID)
@@ -235,6 +430,40 @@ def addTags(id:int, tags:list[str]) -> list[tuple[int, str]]:
     db_pool.putconn(myConection)
     return status
 
+def checkMandatoryTags(tagList:list[str]):
+    """
+    Checks if all mandatory Tag requirements are met
+    """
+    output: list[str]
+
+    myConection = getConn()
+    cur = myConection.cursor()
+
+    cur.execute(
+        """
+with input_tags as (
+select * 
+from tags as t
+where name = ANY(%s)
+)
+select count(it.id) as tag_count, tc.id as cat_id, tc.name as cat_name, tc.mandatory_tags as cat_mandatory_tags
+from tagcats as tc
+    left join input_tags as it on tc.id = it.fk_tagcats
+group by tc.id
+having count(it.id) < tc.mandatory_tags
+        """,
+        (tagList,)
+    )
+    output = cur.fetchall()
+
+    myConection.commit() 
+    db_pool.putconn(myConection)
+
+    status = []
+    for line in output:
+        status.append(f"Category >{line[2]}< requires {line[3]} tags\n")
+    return status
+    
 
 def getIDsAndSuffix(query:dict[str, list[str]]) -> list[tuple[int, str]]:
     """ 
@@ -280,7 +509,7 @@ def getTagsForImg(imgID) -> list[str]:
     cur.execute(
         """
 select tags.name
-from pics_tags as pt
+from map_pics_tags as pt
     join tags on pt.fk_tag = tags.id
 where pt.fk_pic = %s;
         """,
@@ -323,7 +552,7 @@ def deleteImg(imgID:int):
         """
 delete from favs
 where fk_pic = %s;
-delete from pics_tags
+delete from map_pics_tags
 where fk_pic = %s;
 delete from pics
 where pics.id = %s;
@@ -335,7 +564,6 @@ where pics.id = %s;
     db_pool.putconn(myConection)
 
     return status
-
 
 def updateFavs(userID:int, newFavsState:list[tuple[int, bool]]):
     status: str = ''

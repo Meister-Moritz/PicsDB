@@ -42,7 +42,20 @@ join pics_tags on pics.id = fk_pic
 join tags on fk_tag = tags.id
 group by pics.id
 
--- show all who are not from confyUI
+
 from pics
 where created_at < '2025-09-26 11:12';
+
+
+
+with input_tags as (
+select * 
+from tags as t
+where name = ANY(ARRAY['japan', 'gerany'])
+)
+select count(it.id) as tag_count, tc.id as cat_id, tc.name as cat_name, tc.mandatory_tags as cat_mandatory_tags
+from tagcats as tc
+    left join input_tags as it on tc.id = it.fk_tagcats
+group by tc.id
+having count(it.id) < tc.mandatory_tags
 

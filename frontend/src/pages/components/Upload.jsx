@@ -1,11 +1,30 @@
-import {uploadPictures} from "../../static/functions/TalkToBackend";
-import { useState } from "react";
+import {uploadPictures, getMandatoryCats } from "../../static/functions/TalkToBackend";
+import { useState, useEffect } from "react";
 import TagInput from "./TagInput";
 
 export default function Upload(){
     const [status, setStatus] = useState([])
-    const [tagInput, setTagInput] = useState("")
+    const [tagInputs, setTagInputs] = useState([{catID: -1, catName: "empty", mandatoryTags: 0, tags: ""}])
     const [fileInput, setSileInput] = useState([]);  
+    // const [mandatoryCats, setMandatoryCats] = useState([[0,"empty",0]]); 
+
+
+    
+    useEffect(() => {
+        async function loadMandatoryCats() {
+                const data = await getMandatoryCats(); // [[catID, catName, mandatoryTags],... ]
+                const initialTags = [];
+                for(const d of data){
+                    const tmp = {catID: d[0], catName: d[1], mandatoryTags: d[2], tags: ""}
+                    initialTags.push(tmp)
+                }
+
+                initialTags.push({catID: -1, catName: "other", mandatoryTags: 0, tags: ""})
+
+                setTagInputs(initialTags)
+            }
+            loadMandatoryCats();
+        }, []);
     
     return(
 <>
@@ -18,8 +37,18 @@ export default function Upload(){
         onChange={(e) => setSileInput(Array.from(e.target.files))} 
         placeholder="Uplad files"
     />
-    <TagInput tagInput={tagInput} setTagInput={setTagInput}></TagInput>
-   <button onClick={() => uploadPictures(fileInput, tagInput, setStatus)}>Upload</button>
+      {tagInputs.map((tagInput) => (
+        <TagInput
+            key={tagInput.catID}
+            tagInput={tagInput.tags}
+            setTagInputs={setTagInputs}
+            catID={tagInput.catID}
+            catName={tagInput.catName}
+            mandatoryTags={tagInput.mandatoryTags}
+        />
+      ))}
+    
+   <button onClick={() => uploadPictures(fileInput, tagInputs, setStatus)}>Upload</button>
 </details>
 <div>
     <ul>
@@ -31,3 +60,5 @@ export default function Upload(){
 </>
     )
 }
+
+

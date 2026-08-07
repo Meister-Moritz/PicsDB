@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: my_postgres_db
+    restart: always
+    env_file:
+      - ./setup/.env
+    environment:
+      POSTGRES_USER: ${DB_user}
+      POSTGRES_PASSWORD: ${DB_password}
+      POSTGRES_DB: ${DB_name}
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./backend/.pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: my_python_backend
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./setup/.env:/app/.env
+    depends_on:
+          - db
+    healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+          interval: 60s
+          timeout: 2s
+          retries: 5
+          start_period: 5s
+      
+  frontend:
+    build: ./frontend
+    container_name: my_react_frontend
+    ports:
+      - "127.0.0.1:3000:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules

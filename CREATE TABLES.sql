@@ -25,13 +25,23 @@ CREATE TABLE favs (
         REFERENCES pics(id)
 );
 
+CREATE TABLE tag_cats (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    mandatory_tags int
+);
+
 CREATE TABLE tags (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL
+    name VARCHAR(100) UNIQUE NOT NULL,
+    fk_tag_cat int,
+    CONSTRAINT fk_tag_cat
+        FOREIGN KEY (fk_tag_cat)
+        REFERENCES tag_cats(id)
 );
 
 
-CREATE TABLE pics_tags (
+CREATE TABLE map_pics_tags (
     fk_pic INT,
     fk_tag INT,
     CONSTRAINT fk_pic
@@ -48,7 +58,7 @@ CREATE TABLE synonyms (
     name VARCHAR(100) UNIQUE NOT NULL
 );
 
-CREATE TABLE tags_synonyms (
+CREATE TABLE map_tags_synonyms (
     fk_tag INT,
     fk_synonyms INT,
     CONSTRAINT fk_tag

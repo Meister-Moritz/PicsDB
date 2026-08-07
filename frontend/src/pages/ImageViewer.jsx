@@ -1,4 +1,5 @@
 import ControlPannel from "./components/ControlPannel";
+import AuthenticatedImage from "./components/AuthenticatedImage";
 import { useParams } from 'react-router-dom';
 import { API_URL } from "../static/functions/TalkToBackend"
 import { useState, useEffect } from 'react';
@@ -26,12 +27,15 @@ export default function ImageViewer() {
     <>
     {pannel}
     <div className={imgDivClass} onClick={() => setShowDetails(!showDetails)}>
-      <img 
-        className="fullImage" 
-        key={id} 
-        src={`${API_URL}/serveImage?imgID=${id}&OGimg=${true}&suffix=null`} 
-        alt="Sample"
-      />  
+      <AuthenticatedImage 
+        className={"fullImage"} 
+        imgID={id} 
+        key={id}
+        OGimg={true} 
+        suffix={null} 
+        alt={"Sample"}
+      />
+
     </div>
     </>
 );
