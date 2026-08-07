@@ -2,7 +2,7 @@
 # Environment files
 .venv
 .code-workspace
-setup/.env
+.env
 
 # Build output
 dist/
