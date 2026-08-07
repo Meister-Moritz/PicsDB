@@ -31,7 +31,6 @@ export default function CreateTagCat() {
 <div>
     {status}
 </div>
-
 </>
     )
 }

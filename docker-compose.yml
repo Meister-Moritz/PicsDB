@@ -1,10 +1,8 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: my_postgres_db
+    container_name: ${containername_db}
     restart: always
-    env_file:
-      - ./setup/.env
     environment:
       POSTGRES_USER: ${DB_user}
       POSTGRES_PASSWORD: ${DB_password}
@@ -16,14 +14,14 @@ services:
 
   backend:
     build: ./backend
-    container_name: my_python_backend
+    container_name: ${containername_backend}
     environment:
       - PYTHONUNBUFFERED=1
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
       - ./backend:/app
-      - ./setup/.env:/app/.env
+      - .env:/app/.env
     depends_on:
           - db
     healthcheck:
@@ -35,7 +33,7 @@ services:
       
   frontend:
     build: ./frontend
-    container_name: my_react_frontend
+    container_name: ${containername_frontend}
     ports:
       - "127.0.0.1:3000:5173"
     volumes:
