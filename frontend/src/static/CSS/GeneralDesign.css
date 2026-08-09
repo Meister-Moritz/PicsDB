@@ -1,14 +1,23 @@
 /* Conatins general button, text,... desing of website */
 
+:root{
+  --bg-dark: #1a1c21;
+  --bg-light: #282a2e;
+  --text-light: #b9bab6;
+}
+
 button{
     text-decoration: none;
-    color: #007491;
-    background-color: #16e2df;
-    border-radius: 12px;
+    color: var(--text-light);
+    background-color: var(--bg-dark);
     text-align: center;
     text-decoration: none;
     font-size:20px;
     cursor: pointer;
+}
+
+button:hover{
+  background-color: var(--bg-light);
 }
 
 .error {
@@ -39,16 +48,11 @@ button{
   top: 100%;
   left: 0;
   right: 0;
-
-  margin-top: 4px;
-  padding: 4px 0;
+  margin-top: 0px;
+  padding: 0px;
   list-style: none;
-
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  background: var(--bg-dark);
+  box-shadow: 0 8px 20px black;
   z-index: 1000;
 }
 
@@ -66,6 +70,6 @@ button{
 
 .tag_suggestion:hover,
 .tag_suggestion:focus {
-  background-color: #f5f5f5;
+  background-color: var(--bg-light);
   outline: none;
 }

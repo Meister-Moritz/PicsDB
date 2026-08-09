@@ -2,10 +2,13 @@
 
 /* Contains general the Layout and background colors of the Page */
 
+
+
 .myBody{
     margin: 0;
     display: grid;  
-    background-color: #007491;
+    color: var(--text-light);
+    background-color: var(--bg-dark);
     grid-template-columns: 1fr 7fr;
     grid-template-rows: 1fr;
 }
@@ -13,7 +16,7 @@
 
 .ControlPannel{
     /* color */
-    background-color: #00b2a3;
+    background-color: var(--bg-light);
     /* positioning */
     min-height: 100vh;
     overflow:hidden;
@@ -67,7 +70,7 @@ place-items: center;
 position: fixed;
 width: fit-content;
 height: fit-content;
-background-color: #00b2a3;
+background-color: var(--bg-light);
 display: flex;
 flex-direction: column;
 align-items: stretch;
@@ -111,8 +114,8 @@ width: 100%;
 }
 
 .imgPrevBox{
-    background-color: #00b2a3;
-    border:3px solid #00b2a3;
+    background-color: var(--bg-light);
+    border:3px solid var(--bg-light);
     width: max(15vw, 20vh);
     height: max(15vw, 20vh);
     cursor: pointer;
@@ -143,7 +146,7 @@ width: 100%;
 }
 
 .suggestion_tag:hover{
-    background-color: #007491;
+    background-color: var(--bg-light);
 }
 
 
@@ -155,13 +158,13 @@ width: 100%;
     display: grid; 
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
-    background-color: #007491;
+    background-color: var(--bg-dark);
 }
 
 
 .ControlPannel{
 
-    background-color: #00b2a3;
+    background-color: var(--bg-light);
     grid-area: 1 / 2;
 
     position: fixed;
