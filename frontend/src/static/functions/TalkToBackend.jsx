@@ -1,4 +1,4 @@
-export const API_URL = `${window.location.protocol}//${window.location.hostname}:5000`
+// export const API_URL = `${window.location.protocol}//${window.location.hostname}:5000`
 
 
 // requests for img and tags to be uploaded
@@ -13,14 +13,14 @@ export async function uploadPictures(images, tagInputs, setStatus){
     }
 
     const body = formData
-    const response = await postCallProtected("/upload", body)
+    const response = await postCallProtected("/api/upload", body)
     setStatus([await response.json()])
 }
 
 
 // requests all mandatory TagCats
 export async function getMandatoryCats(){
-    const response = await getCallProtected("/getMandatoryCats")
+    const response = await getCallProtected("/api/getMandatoryCats")
     return response.json()
 }
 
@@ -54,14 +54,14 @@ export async function registerUser(username, password) {
 // requests list of TagCategorys
 export async function searchTagCategoryName(inputTagCat){
     const body = JSON.stringify({tags: inputTagCat})
-    const response = await postCallProtected("/suggestTagCategorys", body)
+    const response = await postCallProtected("/api/suggestTagCategorys", body)
     return await response.json();
 }
 
 // requests list of Tags
 export async function searchTagName(inputTag, catID){
     const body = JSON.stringify({tags: inputTag, catID: catID})
-    const response = await postCallProtected("/suggestTags", body)
+    const response = await postCallProtected("/api/suggestTags", body)
     return await response.json();
 }
 
@@ -82,14 +82,14 @@ export async function navigateID(search, imgID, mode){
 // request for a tag and its synonyms to be added
 export async function addTagBackend(tagInput, synonymInput, tagCatInput) {
     const body = JSON.stringify({newTag: tagInput, synonyms:synonymInput, tagCatName:tagCatInput})
-    const response = await postCallProtected("/addTag", body)
+    const response = await postCallProtected("/api/addTag", body)
     return await response.json();   
 }
 
 // request for a tagcat to be added
 export async function addTagCatBackend(tagCatInput, mandatoryInput) {
     const body = JSON.stringify({newTagCat: tagCatInput, mandatoryInput:mandatoryInput})
-    const response = await postCallProtected("/addTagCat", body)
+    const response = await postCallProtected("/api/addTagCat", body)
     return await response.json();      
 }
 
@@ -103,7 +103,7 @@ export async function fetchImageDetail(id) {
 // requests image
 export async function serveImage(imgID, OGimg, suffix) {
     const body = JSON.stringify({imgID:imgID, OGimg:OGimg, suffix:suffix})
-    return await postCallProtected("/serveImage", body)
+    return await postCallProtected("/api/serveImage", body)
 }
 
 // 
@@ -129,7 +129,7 @@ export async function postCallProtected(route, body){
         headers["Content-Type"] = "application/json";
     }
 
-    const response = await fetch(`${API_URL}${route}`, {
+    const response = await fetch(route, {
         method: "POST", // or POST, PUT, DELETE, etc.
         headers: headers,
         body: body
@@ -141,7 +141,7 @@ export async function postCallProtected(route, body){
 export async function getCallProtected(route){
   const token = localStorage.getItem("token");
   
-  const response = await fetch(`${API_URL}${route}`, {
+  const response = await fetch(route, {
     method: "GET", // or POST, PUT, DELETE, etc.
     headers: {
       "Content-Type": "application/json",

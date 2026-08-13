@@ -75,7 +75,7 @@ def navigateID():
 
     return jsonify(queryResults)
 
-@app.route("/serveImage", methods=["POST"])
+@app.route("/api/serveImage", methods=["POST"])
 @jwt_required()
 def serve_image():
     data = request.get_json()
@@ -100,7 +100,7 @@ def serve_image():
     # Send the file to the browser
     return send_file(imgPath)
 
-@app.route("/suggestTags", methods=["POST"])
+@app.route("/api/suggestTags", methods=["POST"])
 @jwt_required()
 def suggestTags():
     input = request.get_json().get("tags")
@@ -109,14 +109,14 @@ def suggestTags():
     return jsonify(results)
 
 
-@app.route("/suggestTagCats", methods=["POST"])
+@app.route("/api/suggestTagCats", methods=["POST"])
 @jwt_required()
 def suggestTagCats():
     input = request.get_json().get("tags")
     results = DB_Handler.searchTagNames(input)
     return jsonify(results)
 
-@app.route("/upload", methods=["POST"])
+@app.route("/api/upload", methods=["POST"])
 @jwt_required()
 def upload():
     tags = request.form.get("tags")
@@ -124,7 +124,7 @@ def upload():
     return jsonify(f.upload(tags, files))
 
 
-@app.route("/getMandatoryCats", methods=["GET"])
+@app.route("/api/getMandatoryCats", methods=["GET"])
 @jwt_required()
 def getMandatoryCats():
     print("backend")
@@ -132,7 +132,7 @@ def getMandatoryCats():
     return jsonify(mandatoryCats)
 
 
-@app.route("/addTag", methods=["POST"])
+@app.route("/api/addTag", methods=["POST"])
 @jwt_required()
 def addTag():
     data = request.get_json()
@@ -142,7 +142,7 @@ def addTag():
     status = f.createNewTag(newTag, synonyms, tagCatName)
     return jsonify(status)
 
-@app.route("/addTagCat", methods=["POST"])
+@app.route("/api/addTagCat", methods=["POST"])
 @jwt_required()
 def addTagCat():
     data = request.get_json()
@@ -170,7 +170,7 @@ def deleteImg():
     status = DB_Handler.deleteImg(id) 
     return jsonify(status)
 
-@app.route("/updateFavs", methods=["POST"])
+@app.route("/api/updateFavs", methods=["POST"])
 @jwt_required()
 def updateFavs():
     newFavState = request.get_json().get("newFavsState")
@@ -178,7 +178,7 @@ def updateFavs():
     status = DB_Handler.updateFavs(userID, newFavState)
     return jsonify(status)
 
-@app.route("/health", methods=["GET"])
+@app.route("/api/health", methods=["GET"])
 def health():
     return {"status": "healthy"}, 200
 

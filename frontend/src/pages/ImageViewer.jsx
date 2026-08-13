@@ -1,7 +1,6 @@
 import ControlPannel from "./components/ControlPannel";
 import AuthenticatedImage from "./components/AuthenticatedImage";
 import { useParams } from 'react-router-dom';
-import { API_URL } from "../static/functions/TalkToBackend"
 import { useState, useEffect } from 'react';
 import '../static/CSS/ImageViewer.css'
 
