@@ -1,11 +1,11 @@
 # Setup
 
-1. Create .env in root of project (if you change the user/db_name change it in the following commands too)
+1. Create .env in root of project
 
     ```env
-    containername_db=""
-    containername_backend=""
-    containername_frontend=""
+    containername_db="picsdb_db"
+    containername_backend="picsdb_backend"
+    containername_frontend="picsdb_frontend"
     DB_name="picsdb_db"
     DB_user="picsdb_admin"
     DB_password=""
@@ -14,12 +14,15 @@
     app_key=""
     jwt_secret_key=""
     ```
-2. run `docker compose up db`
+2. run 
+
+    `docker compose up db --build`
 
 3. run
 
-    ```bash
-    createdb -h localhost -p 5433 -U picsdb_admin picsdb_db
-    psql -h localhost -p 5433 -U picsdb_admin -d picsdb_db -f ./setup/schema.sql
     ```
+    docker exec -it picsdb_db createdb -h localhost -p 5432 -U picsdb_admin picsdb_db
+    docker exec -i picsdb_db psql -h localhost -p 5432 -U picsdb_admin -d picsdb_db < ./setup/schema.sql
+    ```
+
 

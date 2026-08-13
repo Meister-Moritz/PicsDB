@@ -3,6 +3,8 @@
 .venv
 .code-workspace
 .env
+.caddy_stuff/caddy_config/
+.caddy_stuff/caddy_data/
 
 # Build output
 dist/
