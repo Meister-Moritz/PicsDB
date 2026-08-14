@@ -72,8 +72,9 @@ def navigateID():
     mode:str = data.get("mode")
     query = buildNavQueryAndParams(searchTags, imgID, mode)     
     queryResults = DB_Handler.getIDsAndSuffix(query)
-
-    return jsonify(queryResults)
+    tmp = jsonify(queryResults)
+    print (tmp)
+    return tmp
 
 @app.route("/api/serveImage", methods=["POST"])
 @jwt_required()

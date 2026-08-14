@@ -1,5 +1,14 @@
+import { useState } from "react";
 import {searchTagName, addTagBackend, navigateID} from "./TalkToBackend";
 import { jwtDecode } from "jwt-decode";
+
+export function handleAppendSuggestionsSearch(tag, searchInput, setSearchInput, textareaRef){
+    
+    let input_list = searchInput.split(/[,;\s]+/)
+    input_list[input_list.length-1] = tag
+    const newSearchInput = input_list.join("\n") + "\n"
+    setSearchInput(newSearchInput)
+}
 
 export function handleAppendSuggestion(tag, catID, input, setTagInputs, textareaRef){
     let input_list = input.split(/[,;\s]+/)
@@ -154,6 +163,7 @@ export function validateTagInput(raw, minTags, maxTags){
 
 export async function navigateImages(search, currentID, mode, webpage, navigate){
 
+    console.log(search)
     const image = await navigateID(search, currentID, mode)
     let newPage = webpage + currentID
     if(image.length > 0){

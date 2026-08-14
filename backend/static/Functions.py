@@ -138,6 +138,7 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
     ]
     where = []
     params = {}
+    params['posTagsLength'] = len(positivTags)
 
     #fill lists
     if favMode:
@@ -157,6 +158,7 @@ def buildSearchQueryAndParams(searchTags, page, favMode, picsPerSite):
         query += " WHERE " + " AND ".join(where)
 
     query  += '\ngroup by pics.id, pics.suffix' 
+    query  += '\nhaving count(tags.id) >= %(posTagsLength)s'
     query  += '\norder by pics.id desc limit %(limit)s offset %(offset)s' 
    
     params['limit'] = picsPerSite
@@ -205,16 +207,28 @@ def loginUser(username, password):
 
     return {"access_token": access_token}, 200
 
+
+
+
+
+
+
+
+
+
+
 def buildNavQueryAndParams(searchTags, imgID, mode):
     params = []
     query = """
 select pics.id, pics.suffix
 from pics
     left join map_pics_tags on pics.id = map_pics_tags.fk_pic
-    left join tags on map_pics_tags.fk_tag = tags.id"""
-    if searchTags != []:
-        query += 'where tags.name = ANY(%s)'
-        params.append(searchTags)
+    left join tags on map_pics_tags.fk_tag = tags.id
+"""
+    # if searchTags != []:
+    #     query += 'where tags.name = ANY(%s)'
+    #     params.append(searchTags)
+        
 
     if mode == "next":
         query  += """\n where pics.id > %s

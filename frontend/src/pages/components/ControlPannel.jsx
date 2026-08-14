@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {handleAppendSuggestion, handleTagSuggestions, navigateImages, handleAdjustSize, getCurrentUser} from "../../static/functions/GlobalFunctions";
+import {handleAppendSuggestion, handleTagSuggestions, navigateImages, handleAdjustSize, getCurrentUser, handleAppendSuggestionsSearch} from "../../static/functions/GlobalFunctions";
 import { fetchImageDetail, updateFavs, deleteImg } from "../../static/functions/TalkToBackend"
 import { Confirm } from "./PopUp"
 import { useSearch } from "../../App";
@@ -91,12 +91,12 @@ function SearchPannel({search, setSearch}){
         {suggestions.map(tag => <li key={tag}> 
                                 <button 
                                     className="suggestion_tag"  
-                                    onClick={() => handleAppendSuggestion(tag, searchInput, setSearchInput, textareaRef)}
+                                    onClick={() => handleAppendSuggestionsSearch(tag, searchInput, setSearchInput, textareaRef)}
                                 >{tag}
                                 </button>
                                 </li>)}
         </ul>
-        <button onClick={() => setSearch(prev => ({ ...prev, searchTags: searchInput}))}>search</button>
+        <button onClick={() => setSearch(prev => ({ ...prev, searchTags: searchInput + "\n"}))}>search</button>
         </>
     )
 }
