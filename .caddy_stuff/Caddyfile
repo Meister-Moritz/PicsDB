@@ -1,11 +1,15 @@
-localhost {
-    # Send all API requests to your hidden backend container (port 5000 or whatever port your app uses)
+:80 {
     handle /api/* {
         reverse_proxy backend:5000
     }
 
-    # Send everything else to your frontend container
     handle {
-        reverse_proxy frontend:5173
+        reverse_proxy frontend:5173 {
+            # Pass original request host so Vite knows where to route
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
     }
 }
