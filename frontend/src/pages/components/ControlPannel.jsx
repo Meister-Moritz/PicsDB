@@ -64,6 +64,7 @@ function SearchPannel({search, setSearch}){
     const [suggestions, setSuggestions] = useState([]);
     const textareaRef = useRef(null);
 
+    useEffect(() => {if(search.searchTags != ""){setSearchInput(search.searchTags)}}, [])
     useEffect(() => {handleTagSuggestions(searchInput, setSuggestions)}, [searchInput]);
     useEffect(() => handleAdjustSize(textareaRef), [searchInput])
     return(
