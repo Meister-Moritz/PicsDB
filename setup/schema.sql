@@ -328,14 +328,6 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: users users_pass_hash_key; Type: CONSTRAINT; Schema: public; Owner: picsdb_admin
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pass_hash_key UNIQUE (pass_hash);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: picsdb_admin
 --
 
@@ -405,3 +397,5 @@ ALTER TABLE ONLY public.favs
 
 \unrestrict qmLhvQmnIqxcnNy7fJqGUkcIpFIff2dkr0CZdbDVczZgR6VBY02mYgXt7P6dWVH
 
+insert into users (name, pass_hash)
+values ('admin', '$2b$12$o6SridPaqweCBLhUsd6zBuQebmKPyT7yiUuiwXDdstuBTf7TZNb2u');
